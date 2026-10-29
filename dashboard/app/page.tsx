@@ -161,23 +161,27 @@ function DashboardContent() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#06091A] text-white selection:bg-indigo-900/60 relative overflow-hidden">
-      {/* Dot grid */}
-      <div className="absolute inset-0 bg-dot-grid pointer-events-none z-0 opacity-70" />
+    <div className="flex min-h-screen flex-col bg-[var(--canvas)] text-snx-primary relative overflow-hidden transition-colors duration-300">
+      {/* Background Dot Grid */}
+      <div className="absolute inset-0 bg-snx-dots pointer-events-none z-0" />
 
-      {/* Drifting orbs — larger, more vivid */}
-      <div className="orb orb-indigo w-[800px] h-[800px] top-[-250px] left-[-180px] z-0 opacity-25" />
-      <div className="orb orb-violet w-[600px] h-[600px] top-[25%] right-[-150px] z-0 opacity-20" />
-      <div className="orb orb-cyan   w-[500px] h-[500px] bottom-[5%]  left-[15%]   z-0 opacity-18" />
-      <div className="orb orb-emerald w-[450px] h-[450px] bottom-[-100px] right-[5%]  z-0 opacity-15" />
+      {/* Subtle Noise Texture Overlay */}
+      <div className="absolute inset-0 bg-snx-noise pointer-events-none z-0 opacity-40" />
 
+      {/* Drifting Ambient Nebula Orbs */}
+      <div className="orb orb-indigo w-[680px] h-[680px] -top-36 -left-36 z-0" />
+      <div className="orb orb-violet w-[560px] h-[560px] top-[28%] -right-32 z-0" />
+      <div className="orb orb-cyan   w-[500px] h-[500px] bottom-[8%] left-[18%] z-0" />
+      <div className="orb orb-emerald w-[460px] h-[460px] -bottom-24 right-[10%] z-0" />
+
+      {/* Foreground Interactive Content */}
       <div className="relative z-10 flex flex-col flex-1 min-h-screen">
         <Navbar wsConnected={wsConnected} />
 
         <div className="flex-1 flex overflow-hidden">
           <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} />
 
-          <main className="flex-1 overflow-y-auto p-6 md:p-8">
+          <main className="flex-1 overflow-y-auto p-5 sm:p-7 lg:p-8">
             {activeTab === "overview" && <OverviewTab stats={stats} />}
             {activeTab === "devices" && (
               <DevicesTab devices={devices} onRefresh={refreshData} />
@@ -203,19 +207,21 @@ function DashboardContent() {
           </main>
         </div>
 
-        <footer className="glass-1 border-t border-white/[0.09] py-3 px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+        {/* Console Footer */}
+        <footer className="snx-chrome border-t py-2.5 px-6 flex flex-col sm:flex-row items-center justify-between gap-2 z-20 transition-colors duration-300">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 dot-live text-emerald-400" />
-            <span className="text-[11px] font-mono-snx text-white/38">SecureNodeX Edge Consensus · Chain 20260 (QBFT)</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 pulse-beacon" />
+            <span className="text-[11px] font-mono-snx text-snx-muted">
+              SecureNodeX Edge Consensus · Chain 20260 (QBFT)
+            </span>
           </div>
-          <div className="text-[11px] font-mono-snx text-white/22">
+          <div className="text-[11px] font-mono-snx text-snx-muted">
             NIST P-256 ECC &bull; HRW Quorum N=4 R=3 W=2 &bull; ES256 Nonce Verification
           </div>
         </footer>
       </div>
     </div>
   );
-
 }
 
 export default function DashboardHome() {

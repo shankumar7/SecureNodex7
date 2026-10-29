@@ -139,10 +139,10 @@ export const Navbar: React.FC<NavbarProps> = ({ wsConnected }) => {
                 className="flex items-center space-x-2.5 py-1.5 px-3 rounded-xl glass-2 hover:border-white/20 transition-all duration-200 text-left"
               >
                 <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center font-mono-snx text-xs font-bold text-white shadow-sm">
-                  {user.sub?.slice(0, 1).toUpperCase() || "A"}
+                  {user.username?.slice(0, 1).toUpperCase() || "A"}
                 </div>
                 <div className="hidden sm:flex flex-col">
-                  <span className="text-xs font-bold text-snx-primary leading-tight">{user.sub}</span>
+                  <span className="text-xs font-bold text-snx-primary leading-tight">{user.username}</span>
                   <span className="text-[9px] font-mono-snx font-bold text-indigo-400 uppercase leading-none">
                     {currentPreset?.label || currentRole}
                   </span>
@@ -153,7 +153,7 @@ export const Navbar: React.FC<NavbarProps> = ({ wsConnected }) => {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-52 rounded-2xl glass-1 border p-1.5 shadow-xl z-50 animate-slide-fade">
                   <div className="px-3 py-2 border-b border-[var(--border-glass-subtle)] mb-1">
-                    <p className="text-xs font-bold text-snx-primary">{user.sub}</p>
+                    <p className="text-xs font-bold text-snx-primary">{user.username}</p>
                     <p className="text-[10px] font-mono-snx text-snx-muted mt-0.5">
                       Roles: {user.roles?.join(", ") || "None"}
                     </p>

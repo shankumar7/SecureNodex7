@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Search,
   X,
+  Shield,
 } from "lucide-react";
 
 interface DevicesTabProps {
@@ -101,14 +102,14 @@ export const DevicesTab: React.FC<DevicesTabProps> = ({ devices, onRefresh }) =>
   };
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-6 max-w-[1360px] mx-auto animate-slide-fade">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-200 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[var(--border-glass-subtle)] gap-3">
         <div>
-          <h2 className="text-base font-semibold text-zinc-900 tracking-tight">
+          <h2 className="text-xl font-black text-snx-primary tracking-tight">
             Device Registry & Hardware PKI
           </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-xs text-snx-muted mt-1">
             X.509 certificate issuance, SPKI public key fingerprints, and NIST P-256 identities.
           </p>
         </div>
@@ -121,7 +122,7 @@ export const DevicesTab: React.FC<DevicesTabProps> = ({ devices, onRefresh }) =>
               setEnrollLabel("");
               setIsEnrollOpen(true);
             }}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium transition shadow-2xs"
+            className="snx-btn-primary"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Enroll Device</span>
@@ -130,22 +131,22 @@ export const DevicesTab: React.FC<DevicesTabProps> = ({ devices, onRefresh }) =>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
-          <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-snx-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search by device ID or label..."
+            placeholder="Search by device ID or hardware label..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
+            className="snx-input pl-10"
           />
         </div>
 
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-2.5 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-700 font-mono-snx focus:outline-none focus:border-zinc-400 shadow-xs"
+          className="snx-input sm:w-48"
         >
           <option value="ALL">All Statuses</option>
           <option value="ACTIVE">ACTIVE</option>
@@ -156,60 +157,60 @@ export const DevicesTab: React.FC<DevicesTabProps> = ({ devices, onRefresh }) =>
       </div>
 
       {/* Devices Table */}
-      <div className="rounded-lg border border-zinc-200 bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+      <div className="snx-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-zinc-50 text-zinc-500 border-b border-zinc-200 uppercase text-[10px] font-mono-snx tracking-wider">
+            <thead className="bg-[var(--surface-2)] text-snx-muted border-b border-[var(--border-glass-subtle)] uppercase text-[10px] font-mono-snx tracking-wider">
               <tr>
-                <th className="px-3.5 py-2.5 font-mono-snx">Device ID</th>
-                <th className="px-3.5 py-2.5">Label / Type</th>
-                <th className="px-3.5 py-2.5">Status</th>
-                <th className="px-3.5 py-2.5 font-mono-snx">SPKI Fingerprint</th>
-                <th className="px-3.5 py-2.5 font-mono-snx">Cert Serial</th>
-                <th className="px-3.5 py-2.5 text-right font-mono-snx">Action</th>
+                <th className="px-4 py-3 font-mono-snx">Device ID</th>
+                <th className="px-4 py-3">Label / Type</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3 font-mono-snx">SPKI Fingerprint</th>
+                <th className="px-4 py-3 font-mono-snx">Cert Serial</th>
+                <th className="px-4 py-3 text-right font-mono-snx">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 text-zinc-700">
+            <tbody className="divide-y divide-[var(--border-glass-subtle)] text-snx-secondary">
               {filteredDevices.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-zinc-400 font-mono-snx text-xs">
+                  <td colSpan={6} className="px-4 py-10 text-center text-snx-muted font-mono-snx text-xs">
                     No devices registered. Click Enroll Device to provision an identity.
                   </td>
                 </tr>
               ) : (
                 filteredDevices.map((d) => (
-                  <tr key={d.id} className="hover:bg-zinc-50/70 transition">
-                    <td className="px-3.5 py-2.5 font-mono-snx text-zinc-900 font-medium">{d.id}</td>
-                    <td className="px-3.5 py-2.5">
+                  <tr key={d.id} className="hover:bg-[var(--surface-hover)] transition-colors">
+                    <td className="px-4 py-3 font-mono-snx text-snx-primary font-semibold">{d.id}</td>
+                    <td className="px-4 py-3">
                       <div>
-                        <span className="text-zinc-900 font-medium">{d.label}</span>
-                        <p className="text-[10px] text-zinc-500 font-mono-snx">{d.type}</p>
+                        <span className="text-snx-primary font-semibold">{d.label}</span>
+                        <p className="text-[10px] text-snx-muted font-mono-snx">{d.type}</p>
                       </div>
                     </td>
-                    <td className="px-3.5 py-2.5">
+                    <td className="px-4 py-3">
                       <span
-                        className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono-snx ${
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono-snx ${
                           d.status === "ACTIVE"
-                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            ? "badge-emerald"
                             : d.status === "PENDING"
-                            ? "bg-amber-50 text-amber-700 border border-amber-200"
-                            : "bg-rose-50 text-rose-700 border border-rose-200"
+                            ? "badge-amber"
+                            : "badge-rose"
                         }`}
                       >
                         {d.status}
                       </span>
                     </td>
-                    <td className="px-3.5 py-2.5 font-mono-snx text-[11px] text-zinc-500">
-                      {d.spki_fingerprint ? `${d.spki_fingerprint.slice(0, 12)}...` : "—"}
+                    <td className="px-4 py-3 font-mono-snx text-[11px] text-snx-muted">
+                      {d.spki_fingerprint ? `${d.spki_fingerprint.slice(0, 16)}...` : "—"}
                     </td>
-                    <td className="px-3.5 py-2.5 font-mono-snx text-[11px] text-zinc-500">
-                      {d.cert_serial ? d.cert_serial.slice(0, 10) : "—"}
+                    <td className="px-4 py-3 font-mono-snx text-[11px] text-snx-muted">
+                      {d.cert_serial ? d.cert_serial.slice(0, 12) : "—"}
                     </td>
-                    <td className="px-3.5 py-2.5 text-right font-mono-snx">
+                    <td className="px-4 py-3 text-right font-mono-snx">
                       {d.status === "ACTIVE" && canRevoke && (
                         <button
                           onClick={() => handleRevoke(d.id)}
-                          className="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] transition shadow-2xs"
+                          className="px-2.5 py-1 rounded-lg badge-rose text-[11px] hover:opacity-80 transition"
                         >
                           Revoke
                         </button>
@@ -225,30 +226,30 @@ export const DevicesTab: React.FC<DevicesTabProps> = ({ devices, onRefresh }) =>
 
       {/* Enroll Device Modal */}
       {isEnrollOpen && (
-        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-          <div className="w-full max-w-sm glass-1 border border-zinc-200 rounded-xl p-5 space-y-4 shadow-2xl relative text-zinc-900">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-slide-fade">
+          <div className="w-full max-w-sm snx-card p-6 space-y-4 relative">
             <button
               onClick={() => setIsEnrollOpen(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700"
+              className="absolute top-4 right-4 text-snx-muted hover:text-snx-primary"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div>
-              <h3 className="text-sm font-semibold text-zinc-900">Enroll Device Identity</h3>
-              <p className="text-[11px] text-zinc-500">Generates one-time enrollment token</p>
+              <h3 className="text-base font-bold text-snx-primary">Enroll Device Identity</h3>
+              <p className="text-xs text-snx-muted">Generates cryptographic one-time enrollment token</p>
             </div>
 
             {actionError && (
-              <div className="p-2.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
                 {actionError}
               </div>
             )}
 
             {!enrollResult ? (
-              <form onSubmit={handleEnroll} className="space-y-3 text-xs">
+              <form onSubmit={handleEnroll} className="space-y-3.5 text-xs">
                 <div>
-                  <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">
+                  <label className="sec-label block mb-1">
                     Device Label
                   </label>
                   <input
@@ -257,18 +258,18 @@ export const DevicesTab: React.FC<DevicesTabProps> = ({ devices, onRefresh }) =>
                     placeholder="e.g. ESP32-Sensor-01"
                     value={enrollLabel}
                     onChange={(e) => setEnrollLabel(e.target.value)}
-                    className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
+                    className="snx-input"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">
+                  <label className="sec-label block mb-1">
                     Device Type
                   </label>
                   <select
                     value={enrollType}
                     onChange={(e) => setEnrollType(e.target.value)}
-                    className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 font-mono-snx focus:outline-none focus:border-zinc-400 shadow-xs"
+                    className="snx-input"
                   >
                     <option value="esp32-sensor">ESP32 Hardware Sensor</option>
                     <option value="virtual-simulator">Virtual Simulator Device</option>
@@ -276,41 +277,41 @@ export const DevicesTab: React.FC<DevicesTabProps> = ({ devices, onRefresh }) =>
                   </select>
                 </div>
 
-                <div className="pt-2 flex items-center justify-end space-x-2 border-t border-zinc-100">
+                <div className="pt-3 flex items-center justify-end space-x-2 border-t border-[var(--border-glass-subtle)]">
                   <button
                     type="button"
                     onClick={() => setIsEnrollOpen(false)}
-                    className="px-3 py-1.5 rounded-md text-xs text-zinc-500 hover:text-zinc-800 transition"
+                    className="snx-btn-ghost text-xs"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs transition disabled:opacity-50 shadow-xs"
+                    className="snx-btn-primary text-xs"
                   >
                     {isSubmitting ? "Enrolling..." : "Enroll Device"}
                   </button>
                 </div>
               </form>
             ) : (
-              <div className="space-y-3 text-xs">
-                <div className="p-3 rounded-md bg-zinc-50 border border-zinc-200 space-y-1.5">
-                  <div className="flex items-center space-x-1.5 text-emerald-600 font-mono-snx text-xs">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+              <div className="space-y-4 text-xs">
+                <div className="p-3.5 rounded-xl glass-2 border border-[var(--border-glass-subtle)] space-y-2">
+                  <div className="flex items-center space-x-2 text-emerald-400 font-mono-snx text-xs font-bold">
+                    <CheckCircle2 className="w-4 h-4" />
                     <span>Identity Registered</span>
                   </div>
-                  <div className="text-[11px] font-mono-snx text-zinc-700 space-y-0.5">
+                  <div className="text-[11px] font-mono-snx text-snx-secondary space-y-1">
                     <p>ID: {enrollResult.device_id}</p>
-                    <p className="truncate text-zinc-500">Token: {enrollResult.enrollment_token}</p>
+                    <p className="truncate text-snx-muted">Token: {enrollResult.enrollment_token}</p>
                   </div>
                 </div>
 
                 <button
                   onClick={() => handleDownloadBundle(enrollResult)}
-                  className="w-full py-2 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium flex items-center justify-center space-x-1.5 transition shadow-xs"
+                  className="w-full snx-btn-primary"
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <Download className="w-4 h-4" />
                   <span>Download Provisioning Bundle</span>
                 </button>
               </div>

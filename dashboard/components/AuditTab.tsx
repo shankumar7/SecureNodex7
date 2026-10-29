@@ -60,14 +60,17 @@ export const AuditTab: React.FC<AuditTabProps> = ({ events, onRefresh }) => {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-6 max-w-[1360px] mx-auto animate-slide-fade">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-200 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[var(--border-glass-subtle)] gap-3">
         <div>
-          <h2 className="text-base font-semibold text-zinc-900 tracking-tight">
-            Cryptographic Audit Log
-          </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <div className="flex items-center gap-2.5">
+            <ScrollText className="w-5 h-5 text-indigo-400" />
+            <h2 className="text-xl font-black text-snx-primary tracking-tight">
+              Cryptographic Audit Log
+            </h2>
+          </div>
+          <p className="text-xs text-snx-muted mt-1">
             Immutable rolling Keccak-256 hash chain anchored to smart contracts on-chain.
           </p>
         </div>
@@ -76,7 +79,7 @@ export const AuditTab: React.FC<AuditTabProps> = ({ events, onRefresh }) => {
           <button
             onClick={handleVerifyChain}
             disabled={isVerifying}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium transition shadow-2xs disabled:opacity-50"
+            className="snx-btn-primary"
           >
             <ShieldCheck className={`w-3.5 h-3.5 ${isVerifying ? "animate-spin" : ""}`} />
             <span>{isVerifying ? "Recalculating Proofs..." : "Verify Rolling Chain"}</span>
@@ -87,109 +90,111 @@ export const AuditTab: React.FC<AuditTabProps> = ({ events, onRefresh }) => {
       {/* Verification Result Banner */}
       {verifyResult && (
         <div
-          className={`p-3.5 rounded-lg border text-xs font-mono-snx flex items-start justify-between ${
+          className={`p-4 rounded-2xl border text-xs font-mono-snx flex items-start justify-between animate-slide-fade ${
             verifyResult.valid
-              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-              : "bg-rose-50 border-rose-200 text-rose-800"
+              ? "badge-emerald"
+              : "badge-rose"
           }`}
         >
-          <div className="flex items-start space-x-2.5">
+          <div className="flex items-start space-x-3">
             {verifyResult.valid ? (
-              <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
             )}
-            <div className="space-y-0.5">
-              <p className="font-semibold text-zinc-900">
+            <div className="space-y-1">
+              <p className="font-bold text-sm">
                 {verifyResult.valid
                   ? "Cryptographic Hash Chain Intact"
                   : "Hash Chain Verification Failed"}
               </p>
-              <p className="text-[11px] text-zinc-600">
+              <p className="text-[11px] opacity-80">
                 {verifyResult.valid
-                  ? `Verified from genesis block: head = ${verifyResult.computed_head?.slice(0, 16)}...`
+                  ? `Verified from genesis block: head = ${verifyResult.computed_head?.slice(0, 20)}...`
                   : verifyResult.error}
               </p>
             </div>
           </div>
           <button
             onClick={() => setVerifyResult(null)}
-            className="text-zinc-400 hover:text-zinc-700"
+            className="text-snx-muted hover:text-snx-primary"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
       {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
-          <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-snx-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by actor, subject, or event..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
+            className="snx-input pl-10"
           />
         </div>
 
         <select
           value={eventTypeFilter}
           onChange={(e) => setEventTypeFilter(e.target.value)}
-          className="px-2.5 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-700 font-mono-snx focus:outline-none focus:border-zinc-400 shadow-xs"
+          className="snx-input sm:w-56"
         >
           <option value="ALL">All Event Types</option>
           <option value="DEVICE_REGISTER">DEVICE_REGISTER</option>
           <option value="OBJECT_CREATE">OBJECT_CREATE</option>
           <option value="TELEMETRY_ANCHOR">TELEMETRY_ANCHOR</option>
           <option value="PRINCIPAL_CREATE">PRINCIPAL_CREATE</option>
+          <option value="STORAGE_NODE_JOIN">STORAGE_NODE_JOIN</option>
+          <option value="QUORUM_VERIFIED">QUORUM_VERIFIED</option>
           <option value="LOGIN">LOGIN</option>
         </select>
       </div>
 
       {/* Events Table */}
-      <div className="rounded-lg border border-zinc-200 bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+      <div className="snx-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono-snx">
-            <thead className="bg-zinc-50 text-zinc-500 border-b border-zinc-200 uppercase text-[10px] tracking-wider">
+            <thead className="bg-[var(--surface-2)] text-snx-muted border-b border-[var(--border-glass-subtle)] uppercase text-[10px] tracking-wider">
               <tr>
-                <th className="px-3.5 py-2.5">Seq</th>
-                <th className="px-3.5 py-2.5">Event Type</th>
-                <th className="px-3.5 py-2.5">Actor</th>
-                <th className="px-3.5 py-2.5">Subject</th>
-                <th className="px-3.5 py-2.5">Rolling Head</th>
-                <th className="px-3.5 py-2.5">Timestamp</th>
+                <th className="px-4 py-3">Seq</th>
+                <th className="px-4 py-3">Event Type</th>
+                <th className="px-4 py-3">Actor</th>
+                <th className="px-4 py-3">Subject</th>
+                <th className="px-4 py-3">Rolling Head</th>
+                <th className="px-4 py-3">Timestamp</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 text-zinc-700">
+            <tbody className="divide-y divide-[var(--border-glass-subtle)] text-snx-secondary">
               {filteredEvents.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-zinc-400 text-xs">
+                  <td colSpan={6} className="px-4 py-10 text-center text-snx-muted text-xs">
                     No matching audit events recorded yet.
                   </td>
                 </tr>
               ) : (
                 filteredEvents.map((ev, idx) => (
-                  <tr key={ev.id || idx} className="hover:bg-zinc-50/70 transition">
-                    <td className="px-3.5 py-2.5 text-zinc-500">
+                  <tr key={ev.id || idx} className="hover:bg-[var(--surface-hover)] transition-colors">
+                    <td className="px-4 py-3 text-snx-muted font-bold">
                       #{ev.seq !== undefined ? ev.seq : idx + 1}
                     </td>
-                    <td className="px-3.5 py-2.5">
-                      <span className="inline-block px-1.5 py-0.5 rounded text-[10px] bg-zinc-100 text-zinc-700 border border-zinc-200 font-medium">
+                    <td className="px-4 py-3">
+                      <span className="pill-mono text-[9px] font-bold">
                         {ev.event_type}
                       </span>
                     </td>
-                    <td className="px-3.5 py-2.5 text-zinc-900 font-medium">
+                    <td className="px-4 py-3 text-snx-primary font-semibold">
                       {ev.actor || ev.actor_id || "system"}
                     </td>
-                    <td className="px-3.5 py-2.5 text-zinc-600 truncate max-w-xs">
+                    <td className="px-4 py-3 text-snx-secondary truncate max-w-xs">
                       {ev.subject || ev.subject_id || "—"}
                     </td>
-                    <td className="px-3.5 py-2.5 text-[11px] text-zinc-500">
-                      {(ev.head || ev.data_hash || "").slice(0, 10)}...
+                    <td className="px-4 py-3 text-[11px] text-snx-muted">
+                      {(ev.head || ev.data_hash || "").slice(0, 14)}...
                     </td>
-                    <td className="px-3.5 py-2.5 text-zinc-500 text-[11px]">
+                    <td className="px-4 py-3 text-snx-muted text-[11px]">
                       {ev.timestamp ? new Date(ev.timestamp * 1000).toLocaleTimeString() : "—"}
                     </td>
                   </tr>

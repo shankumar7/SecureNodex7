@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { TelemetryMessage } from "../lib/types";
 import { api } from "../lib/api";
-import { Radio, ShieldCheck, CheckCircle, ExternalLink, Hash, Eye, X } from "lucide-react";
+import { Radio, ShieldCheck, CheckCircle, ExternalLink, Hash, Eye, X, Activity } from "lucide-react";
 
 interface TelemetryTabProps {
   messages: TelemetryMessage[];
@@ -48,67 +48,71 @@ export const TelemetryTab: React.FC<TelemetryTabProps> = ({ messages }) => {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-6 max-w-[1360px] mx-auto animate-slide-fade">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-200 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[var(--border-glass-subtle)] gap-3">
         <div>
-          <h2 className="text-base font-semibold text-zinc-900 tracking-tight">
-            Live Telemetry Ingestion
-          </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <div className="flex items-center gap-2.5">
+            <Radio className="w-5 h-5 text-emerald-400" />
+            <h2 className="text-xl font-black text-snx-primary tracking-tight">
+              Live Telemetry Ingestion
+            </h2>
+          </div>
+          <p className="text-xs text-snx-muted mt-1">
             Signed envelopes (NIST P-256 ECDSA r||s) ingested via MQTT over mutual TLS.
           </p>
         </div>
-        <span className="text-[11px] font-mono-snx px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 self-start sm:self-auto">
-          QoS 1 Ingestion Active
-        </span>
+        <div className="pill-live self-start sm:self-auto">
+          <span className="h-2 w-2 rounded-full bg-emerald-400 pulse-beacon" />
+          <span>QoS 1 Ingestion Active</span>
+        </div>
       </div>
 
       {/* Messages Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {messages.length === 0 ? (
-          <div className="col-span-full p-8 text-center rounded-lg glass-1 border border-zinc-200 text-zinc-400 font-mono-snx text-xs shadow-2xs">
+          <div className="col-span-full p-12 text-center snx-card text-snx-muted font-mono-snx text-xs">
             Listening for device telemetry stream...
           </div>
         ) : (
           messages.slice(0, 18).map((msg) => (
             <div
               key={msg.id}
-              className="p-3.5 rounded-lg glass-1 border border-zinc-200 hover:border-zinc-300 space-y-2.5 transition shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+              className="p-4 rounded-2xl glass-2 border border-[var(--border-glass-subtle)] hover:border-[var(--border-glass)] space-y-3 transition-all duration-200"
             >
               <div className="flex items-center justify-between">
-                <span className="font-mono-snx text-xs font-semibold text-zinc-900">
+                <span className="font-mono-snx text-xs font-bold text-snx-primary">
                   {msg.device_id}
                 </span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-zinc-100 text-zinc-600 font-mono-snx border border-zinc-200">
+                <span className="pill-mono text-[9px]">
                   seq #{msg.seq}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-1.5 text-xs font-mono-snx">
-                <div className="p-2 rounded bg-zinc-50 border border-zinc-200">
-                  <span className="text-[10px] text-zinc-400 uppercase">Temp</span>
-                  <p className="font-semibold text-zinc-900 text-xs">
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono-snx">
+                <div className="p-2.5 rounded-xl glass-1 border border-[var(--border-glass-subtle)]">
+                  <span className="text-[10px] text-snx-muted uppercase font-bold">Temp</span>
+                  <p className="font-bold text-snx-primary text-sm mt-0.5">
                     {msg.payload.temp_c !== undefined ? `${msg.payload.temp_c} °C` : "22.4 °C"}
                   </p>
                 </div>
-                <div className="p-2 rounded bg-zinc-50 border border-zinc-200">
-                  <span className="text-[10px] text-zinc-400 uppercase">Humidity</span>
-                  <p className="font-semibold text-zinc-900 text-xs">
+                <div className="p-2.5 rounded-xl glass-1 border border-[var(--border-glass-subtle)]">
+                  <span className="text-[10px] text-snx-muted uppercase font-bold">Humidity</span>
+                  <p className="font-bold text-snx-primary text-sm mt-0.5">
                     {msg.payload.hum_pct !== undefined ? `${msg.payload.hum_pct} %` : "45.0 %"}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-1 border-t border-zinc-100 text-[10px] font-mono-snx text-zinc-500">
-                <span className="text-emerald-600 flex items-center space-x-1">
+              <div className="flex items-center justify-between pt-2 border-t border-[var(--border-glass-subtle)] text-[10px] font-mono-snx">
+                <span className="badge-emerald px-2 py-0.5 rounded-full flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3" />
                   <span>P-256 Valid</span>
                 </span>
 
                 <button
                   onClick={() => handleInspectProof(msg)}
-                  className="hover:text-zinc-900 transition underline underline-offset-2"
+                  className="text-indigo-400 hover:text-indigo-300 font-semibold transition underline underline-offset-2"
                 >
                   Inspect Proof
                 </button>
@@ -120,51 +124,51 @@ export const TelemetryTab: React.FC<TelemetryTabProps> = ({ messages }) => {
 
       {/* Proof Inspection Modal */}
       {selectedMsg && (
-        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-          <div className="w-full max-w-lg glass-1 border border-zinc-200 rounded-xl p-5 space-y-4 shadow-2xl relative text-zinc-900">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-slide-fade">
+          <div className="w-full max-w-lg snx-card p-6 space-y-4 relative">
             <button
               onClick={() => setSelectedMsg(null)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700"
+              className="absolute top-4 right-4 text-snx-muted hover:text-snx-primary"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div>
-              <h3 className="text-sm font-semibold text-zinc-900">Merkle Audit Proof</h3>
-              <p className="text-[11px] text-zinc-500 font-mono-snx">
+              <h3 className="text-base font-bold text-snx-primary">Merkle Audit Proof</h3>
+              <p className="text-xs text-snx-muted font-mono-snx mt-0.5">
                 Device: {selectedMsg.device_id} &bull; Seq: #{selectedMsg.seq}
               </p>
             </div>
 
             {isLoadingProof ? (
-              <div className="p-8 text-center text-xs font-mono-snx text-zinc-400">
-                Recalculating hash tree...
+              <div className="p-8 text-center text-xs font-mono-snx text-snx-muted">
+                Recalculating cryptographic hash tree...
               </div>
             ) : proofResult ? (
-              <div className="space-y-3 text-xs font-mono-snx">
-                <div className="p-2.5 rounded bg-zinc-50 border border-zinc-200 space-y-1">
-                  <span className="text-[10px] text-zinc-400 uppercase">Anchored Merkle Root</span>
-                  <p className="text-[11px] text-zinc-800 truncate">{proofResult.merkle_root}</p>
+              <div className="space-y-3.5 text-xs font-mono-snx">
+                <div className="p-3 rounded-xl glass-2 border border-[var(--border-glass-subtle)] space-y-1">
+                  <span className="sec-label block">Anchored Merkle Root</span>
+                  <p className="text-xs font-bold text-snx-primary truncate">{proofResult.merkle_root}</p>
                 </div>
 
-                <div className="space-y-1">
-                  <span className="text-[10px] text-zinc-400 uppercase">Proof Sibling Path</span>
-                  <div className="space-y-1 max-h-36 overflow-y-auto">
+                <div className="space-y-1.5">
+                  <span className="sec-label block">Proof Sibling Path</span>
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto">
                     {proofResult.proof?.map((item: any, idx: number) => (
                       <div
                         key={idx}
-                        className="p-2 rounded bg-zinc-50 border border-zinc-200 flex items-center justify-between text-[10px]"
+                        className="p-2.5 rounded-lg glass-2 border border-[var(--border-glass-subtle)] flex items-center justify-between text-[11px]"
                       >
-                        <span className="text-zinc-500">Sibling #{idx + 1} ({item.pos})</span>
-                        <span className="text-zinc-800 truncate max-w-xs">{item.hash}</span>
+                        <span className="text-snx-muted">Sibling #{idx + 1} ({item.pos})</span>
+                        <span className="text-snx-primary font-semibold truncate max-w-xs">{item.hash}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="p-2.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center space-x-1.5 text-xs">
-                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                  <span>Proof verified to contract anchor root</span>
+                <div className="p-3 rounded-xl badge-emerald flex items-center space-x-2 text-xs">
+                  <ShieldCheck className="w-4 h-4 shrink-0" />
+                  <span>Proof verified to EVM contract anchor root</span>
                 </div>
               </div>
             ) : null}

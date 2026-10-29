@@ -79,14 +79,17 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
   ];
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-6 max-w-[1360px] mx-auto animate-slide-fade">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-200 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[var(--border-glass-subtle)] gap-3">
         <div>
-          <h2 className="text-base font-semibold text-zinc-900 tracking-tight">
-            Digital Asset Registry
-          </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <div className="flex items-center gap-2.5">
+            <Coins className="w-5 h-5 text-amber-400" />
+            <h2 className="text-xl font-black text-snx-primary tracking-tight">
+              Digital Asset Registry
+            </h2>
+          </div>
+          <p className="text-xs text-snx-muted mt-1">
             Tokenized datasets and physical device digital twins with custodial transfer checks.
           </p>
         </div>
@@ -97,7 +100,7 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
               setErrorMsg(null);
               setIsMintOpen(true);
             }}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium transition shadow-2xs"
+            className="snx-btn-primary"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Mint Asset</span>
@@ -106,46 +109,46 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
       </div>
 
       {/* Assets Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {effectiveAssets.length === 0 ? (
-          <div className="col-span-full p-8 text-center rounded-lg glass-1 border border-zinc-200 text-zinc-400 font-mono-snx text-xs shadow-2xs">
+          <div className="col-span-full p-12 text-center snx-card text-snx-muted font-mono-snx text-xs">
             No digital assets minted yet.
           </div>
         ) : (
           effectiveAssets.map((asset) => (
             <div
               key={asset.token_id}
-              className="p-3.5 rounded-lg glass-1 border border-zinc-200 hover:border-zinc-300 transition space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+              className="p-4 rounded-2xl glass-2 border border-[var(--border-glass-subtle)] hover:border-[var(--border-glass)] transition-all space-y-3"
             >
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-zinc-900 text-xs truncate">{asset.name}</span>
-                <span className="text-[10px] font-mono-snx px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200 font-medium">
+                <span className="font-bold text-snx-primary text-xs truncate max-w-[200px]">{asset.name}</span>
+                <span className="pill-mono text-[9px] font-bold">
                   #{asset.token_id}
                 </span>
               </div>
 
-              <div className="space-y-1 text-xs font-mono-snx text-zinc-500">
+              <div className="space-y-1.5 text-xs font-mono-snx">
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-zinc-400">Owner:</span>
-                  <span className="text-zinc-800 truncate max-w-xs">{asset.owner_id}</span>
+                  <span className="text-snx-muted">Owner:</span>
+                  <span className="text-snx-primary font-semibold truncate max-w-xs">{asset.owner_id}</span>
                 </div>
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-zinc-400">Manifest:</span>
-                  <span className="text-zinc-700 truncate max-w-xs">{asset.manifest_cid.slice(0, 10)}...</span>
+                  <span className="text-snx-muted">Manifest:</span>
+                  <span className="text-snx-secondary truncate max-w-xs">{asset.manifest_cid.slice(0, 16)}...</span>
                 </div>
               </div>
 
               {canTransfer && (
-                <div className="pt-2 border-t border-zinc-100 flex justify-end">
+                <div className="pt-2.5 border-t border-[var(--border-glass-subtle)] flex justify-end">
                   <button
                     onClick={() => {
                       setSelectedAsset(asset);
                       setIsTransferOpen(true);
                       setErrorMsg(null);
                     }}
-                    className="px-2.5 py-1 rounded bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 text-xs font-mono-snx transition shadow-2xs inline-flex items-center space-x-1"
+                    className="snx-btn-ghost text-xs"
                   >
-                    <Send className="w-3 h-3 text-zinc-400" />
+                    <Send className="w-3 h-3 text-indigo-400" />
                     <span>Transfer</span>
                   </button>
                 </div>
@@ -157,75 +160,75 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
 
       {/* Mint Modal */}
       {isMintOpen && (
-        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-          <div className="w-full max-w-sm glass-1 border border-zinc-200 rounded-xl p-5 space-y-4 shadow-2xl relative text-zinc-900">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-slide-fade">
+          <div className="w-full max-w-sm snx-card p-6 space-y-4 relative">
             <button
               onClick={() => setIsMintOpen(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700"
+              className="absolute top-4 right-4 text-snx-muted hover:text-snx-primary"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div>
-              <h3 className="text-sm font-semibold text-zinc-900">Mint Asset</h3>
-              <p className="text-[11px] text-zinc-500">Creates on-chain custodial ERC-721 token</p>
+              <h3 className="text-base font-bold text-snx-primary">Mint Asset</h3>
+              <p className="text-xs text-snx-muted">Creates on-chain custodial ERC-721 token</p>
             </div>
 
             {errorMsg && (
-              <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
                 {errorMsg}
               </div>
             )}
 
-            <form onSubmit={handleMint} className="space-y-3 text-xs">
+            <form onSubmit={handleMint} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">Asset Name</label>
+                <label className="sec-label block mb-1">Asset Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Energy Monitor Snapshot"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
+                  className="snx-input"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">Custodial Owner ID</label>
+                <label className="sec-label block mb-1">Custodial Owner ID</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. p-admin-01"
                   value={ownerId}
                   onChange={(e) => setOwnerId(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
+                  className="snx-input"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">Manifest CID</label>
+                <label className="sec-label block mb-1">Manifest CID</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi"
                   value={manifestCid}
                   onChange={(e) => setManifestCid(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
+                  className="snx-input"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end space-x-2 border-t border-zinc-100">
+              <div className="pt-3 flex justify-end space-x-2 border-t border-[var(--border-glass-subtle)]">
                 <button
                   type="button"
                   onClick={() => setIsMintOpen(false)}
-                  className="px-3 py-1.5 rounded-md text-xs text-zinc-500 hover:text-zinc-800 transition"
+                  className="snx-btn-ghost text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs transition disabled:opacity-50 shadow-xs"
+                  className="snx-btn-primary text-xs"
                 >
                   {isSubmitting ? "Minting..." : "Mint"}
                 </button>
@@ -237,29 +240,29 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
 
       {/* Transfer Modal */}
       {isTransferOpen && selectedAsset && (
-        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-          <div className="w-full max-w-sm glass-1 border border-zinc-200 rounded-xl p-5 space-y-4 shadow-2xl relative text-zinc-900">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-slide-fade">
+          <div className="w-full max-w-sm snx-card p-6 space-y-4 relative">
             <button
               onClick={() => setIsTransferOpen(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700"
+              className="absolute top-4 right-4 text-snx-muted hover:text-snx-primary"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div>
-              <h3 className="text-sm font-semibold text-zinc-900">Transfer Asset</h3>
-              <p className="text-[11px] text-zinc-500 font-mono-snx">{selectedAsset.name} (#{selectedAsset.token_id})</p>
+              <h3 className="text-base font-bold text-snx-primary">Transfer Asset</h3>
+              <p className="text-xs text-snx-muted font-mono-snx">{selectedAsset.name} (#{selectedAsset.token_id})</p>
             </div>
 
             {errorMsg && (
-              <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
                 {errorMsg}
               </div>
             )}
 
-            <form onSubmit={handleTransfer} className="space-y-3 text-xs">
+            <form onSubmit={handleTransfer} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">
+                <label className="sec-label block mb-1">
                   Recipient Principal ID
                 </label>
                 <input
@@ -268,22 +271,22 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
                   placeholder="e.g. p-user1-01"
                   value={toPrincipalId}
                   onChange={(e) => setToPrincipalId(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
+                  className="snx-input"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end space-x-2 border-t border-zinc-100">
+              <div className="pt-3 flex justify-end space-x-2 border-t border-[var(--border-glass-subtle)]">
                 <button
                   type="button"
                   onClick={() => setIsTransferOpen(false)}
-                  className="px-3 py-1.5 rounded-md text-xs text-zinc-500 hover:text-zinc-800 transition"
+                  className="snx-btn-ghost text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs transition disabled:opacity-50 shadow-xs"
+                  className="snx-btn-primary text-xs"
                 >
                   {isSubmitting ? "Transferring..." : "Transfer"}
                 </button>
