@@ -108,3 +108,70 @@ class ChainSyncState(Base):
     contract_name = Column(String(64), primary_key=True)
     last_block_number = Column(BigInteger, nullable=False, default=0)
     updated_at = Column(DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now)
+
+
+class StorageNode(Base):
+    __tablename__ = "storage_nodes"
+
+    id = Column(String(64), primary_key=True)
+    endpoint = Column(String(255), nullable=False)
+    state = Column(String(32), nullable=False, default="UP")  # UP, SUSPECT, DOWN, SYNCING
+    free_bytes = Column(BigInteger, nullable=False, default=10 * 1024 * 1024 * 1024)
+    used_bytes = Column(BigInteger, nullable=False, default=0)
+    chunk_count = Column(Integer, nullable=False, default=0)
+    last_heartbeat = Column(DateTime(timezone=True), nullable=True)
+    fingerprint = Column(String(64), nullable=True)
+    draining = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now)
+
+
+class StoredObject(Base):
+    __tablename__ = "stored_objects"
+
+    id = Column(String(64), primary_key=True)  # UUID
+    manifest_id = Column(String(64), nullable=False, index=True)
+    owner_id = Column(String(128), nullable=False, index=True)
+    name = Column(String(255), nullable=False)
+    size = Column(BigInteger, nullable=False)
+    chunk_count = Column(Integer, nullable=False)
+    merkle_root = Column(String(64), nullable=False)
+    classification = Column(String(32), nullable=False, default="internal")
+    status = Column(String(32), nullable=False, default="ACTIVE")  # ACTIVE, TOMBSTONED
+    dek_hex = Column(String(64), nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now)
+
+
+class StoredChunk(Base):
+    __tablename__ = "stored_chunks"
+
+    id = Column(String(64), primary_key=True)  # SHA-256 of ciphertext
+    object_id = Column(String(64), ForeignKey("stored_objects.id", ondelete="CASCADE"), nullable=False, index=True)
+    idx = Column(Integer, nullable=False)
+    length = Column(Integer, nullable=False)
+    kind = Column(String(32), nullable=False, default="data")
+    nonce = Column(String(64), nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+class ChunkReplica(Base):
+    __tablename__ = "chunk_replicas"
+
+    id = Column(String(64), primary_key=True, default=lambda: str(uuid.uuid4()))
+    chunk_id = Column(String(64), ForeignKey("stored_chunks.id", ondelete="CASCADE"), nullable=False, index=True)
+    node_id = Column(String(64), ForeignKey("storage_nodes.id", ondelete="CASCADE"), nullable=False, index=True)
+    state = Column(String(32), nullable=False, default="stored")  # pending, stored, corrupt, missing
+    verified_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+class ObjectGrant(Base):
+    __tablename__ = "object_grants"
+
+    id = Column(String(64), primary_key=True, default=lambda: str(uuid.uuid4()))
+    object_id = Column(String(64), ForeignKey("stored_objects.id", ondelete="CASCADE"), nullable=False, index=True)
+    grantee_id = Column(String(128), nullable=False, index=True)
+    grant_blob_id = Column(String(64), nullable=False)
+    permissions = Column(Integer, nullable=False, default=1)  # 1=READ, 2=WRITE
+    created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)
