@@ -13,6 +13,7 @@ import {
   FileText,
   X,
   AlertTriangle,
+  Trash2,
 } from "lucide-react";
 
 interface ObjectsTabProps {
@@ -32,6 +33,7 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
   const [activePlacementObj, setActivePlacementObj] = useState<StoredObject | null>(null);
   const [placementData, setPlacementData] = useState<any | null>(null);
   const [isLoadingPlacement, setIsLoadingPlacement] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const canCreate = hasPermission("object:create");
   const canDelete = hasPermission("object:delete");
@@ -108,20 +110,29 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
   };
 
   const handleTombstone = async (id: string) => {
-    if (!confirm("Are you sure you want to tombstone this object?")) return;
+    if (!confirm("Are you sure you want to delete this object from decentralized storage?")) return;
     try {
       await api.tombstoneObject(id);
       onRefresh();
     } catch (err: any) {
-      alert(`Tombstone failed: ${err.message}`);
+      alert(`Delete failed: ${err.message}`);
     }
   };
 
-  const effectiveObjects: StoredObject[] = objects.length > 0 ? objects : [
-    { id: "obj-telemetry-oct29", name: "cluster_telemetry_dataset_20261029.bin", size: 60341819, chunk_count: 951, classification: "internal", merkle_root: "0x7a8f9b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a", status: "ACTIVE", manifest_id: "m-telemetry-01", created_at: "2026-10-29T11:00:00Z" },
-    { id: "obj-firmware-v2", name: "secure_boot_firmware_v2.4.bin", size: 1048576, chunk_count: 16, classification: "restricted", merkle_root: "0x918273645a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d", status: "ACTIVE", manifest_id: "m-firmware-02", created_at: "2026-10-29T14:20:00Z" },
-    { id: "obj-audit-anchors", name: "hyperledger_audit_anchors.json", size: 204800, chunk_count: 4, classification: "confidential", merkle_root: "0x5f4e3d2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7f6e", status: "ACTIVE", manifest_id: "m-anchors-03", created_at: "2026-10-29T16:05:00Z" },
-  ];
+  const handleClearAll = async () => {
+    if (!confirm("Are you sure you want to permanently clear all stored objects from decentralized storage?")) return;
+    setIsClearing(true);
+    try {
+      await api.clearAllObjects();
+      onRefresh();
+    } catch (err: any) {
+      alert(`Clear failed: ${err.message}`);
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  const effectiveObjects: StoredObject[] = objects;
 
   return (
     <div className="space-y-6 max-w-[1360px] mx-auto animate-slide-fade">
@@ -136,18 +147,32 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
           </p>
         </div>
 
-        {canCreate && (
-          <button
-            onClick={() => {
-              setUploadError(null);
-              setIsUploadOpen(true);
-            }}
-            className="snx-btn-primary"
-          >
-            <Upload className="w-3.5 h-3.5" />
-            <span>Upload Object</span>
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {objects.length > 0 && (
+            <button
+              onClick={handleClearAll}
+              disabled={isClearing}
+              className="px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-500/20 text-rose-600 dark:text-rose-400 bg-rose-50/60 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 text-xs font-medium flex items-center gap-1.5 transition disabled:opacity-50"
+              title="Clear all stored objects"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+              <span>{isClearing ? "Clearing..." : "Clear All Data"}</span>
+            </button>
+          )}
+
+          {canCreate && (
+            <button
+              onClick={() => {
+                setUploadError(null);
+                setIsUploadOpen(true);
+              }}
+              className="snx-btn-primary"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>Upload Object</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Objects Table */}
@@ -161,14 +186,16 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
                 <th className="px-4 py-3">Classification</th>
                 <th className="px-4 py-3 font-mono-snx">Merkle Root</th>
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right font-mono-snx">Actions</th>
+                <th className="px-4 py-3 text-right font-mono-snx whitespace-nowrap min-w-[340px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-glass-subtle)] text-snx-secondary">
               {effectiveObjects.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-snx-muted font-mono-snx text-xs">
-                    No stored objects yet. Upload a dataset to distribute chunks.
+                  <td colSpan={6} className="px-4 py-14 text-center text-snx-muted font-mono-snx text-xs">
+                    <HardDrive className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600 opacity-60" />
+                    <p className="font-semibold text-slate-700 dark:text-slate-300">No decentralized files stored</p>
+                    <p className="text-[11px] mt-1 text-slate-400">All data has been cleared. Click "Upload Object" to store encrypted files.</p>
                   </td>
                 </tr>
               ) : (
@@ -205,39 +232,44 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
                         {obj.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right space-x-1.5 font-mono-snx">
-                      <button
-                        onClick={() => handleViewPlacement(obj)}
-                        className="snx-btn-ghost text-[11px]"
-                      >
-                        <Grid className="w-3 h-3 text-indigo-400" />
-                        <span>Placement</span>
-                      </button>
+                    <td className="px-4 py-2.5 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => handleViewPlacement(obj)}
+                          className="snx-btn-ghost px-2.5 py-1 text-[11px]"
+                          title="View HRW placement matrix"
+                        >
+                          <Grid className="w-3 h-3 text-indigo-500" />
+                          <span>Placement</span>
+                        </button>
 
-                      <button
-                        onClick={() => handleVerify(obj.id)}
-                        className="snx-btn-ghost text-[11px]"
-                      >
-                        <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                        <span>Verify</span>
-                      </button>
+                        <button
+                          onClick={() => handleVerify(obj.id)}
+                          className="snx-btn-ghost px-2.5 py-1 text-[11px]"
+                          title="Cryptographic verification"
+                        >
+                          <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                          <span>Verify</span>
+                        </button>
 
-                      <button
-                        onClick={() => handleDownload(obj)}
-                        className="snx-btn-ghost text-[11px]"
-                      >
-                        <Download className="w-3 h-3 text-cyan-400" />
-                        <span>Download</span>
-                      </button>
+                        <button
+                          onClick={() => handleDownload(obj)}
+                          className="snx-btn-ghost px-2.5 py-1 text-[11px]"
+                          title="Download file"
+                        >
+                          <Download className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
+                          <span>Download</span>
+                        </button>
 
-                      {canDelete && obj.status === "ACTIVE" && (
                         <button
                           onClick={() => handleTombstone(obj.id)}
-                          className="px-2 py-1 rounded-lg badge-rose text-[11px] hover:opacity-80 transition"
+                          className="snx-btn-ghost px-2.5 py-1 text-[11px] text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-300 dark:hover:border-rose-500/30"
+                          title="Delete object"
                         >
-                          Tombstone
+                          <Trash2 className="w-3 h-3 text-rose-500" />
+                          <span>Delete</span>
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))

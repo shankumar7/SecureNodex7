@@ -237,6 +237,12 @@ class ApiClient {
     });
   }
 
+  async clearAllObjects() {
+    return this.request<{ status: string; count: number }>("/v1/objects", {
+      method: "DELETE",
+    });
+  }
+
   // --- Storage Health & Nodes ---
   async getStorageHealth(): Promise<ClusterHealth> {
     return this.request<ClusterHealth>("/v1/storage/health");

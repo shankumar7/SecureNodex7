@@ -47,12 +47,12 @@ async def get_live_storage_nodes(db: AsyncSession) -> list[StorageNodeInfo]:
 
     return [
         StorageNodeInfo(
-            id=n.id,
-            endpoint=n.endpoint,
-            state=n.state,
-            free_bytes=n.free_bytes,
+            id=str(n.id),
+            endpoint=str(n.endpoint),
+            state=str(n.state),
+            free_bytes=int(n.free_bytes),
             draining=bool(n.draining),
-            fingerprint=n.fingerprint or "",
+            fingerprint=str(n.fingerprint or ""),
         )
         for n in db_nodes
     ]
@@ -128,12 +128,14 @@ async def upload_object(
     tx_hash = None
     if chain_client.is_connected() and "DataRegistry" in chain_client.contracts:
         try:
-            # registerObject(bytes32 objectId, uint32 schemaVersion, bytes32 ownerIdentityId, bytes32 metaHash)
             dr_res = chain_client.register_object(
                 object_id=obj_id,
-                schema_version=1,
-                owner_id=current_user.id,
-                meta_hash=manifest_id,
+                manifest_id=manifest_id,
+                merkle_root=str(manifest["merkle_root"]),
+                size=len(content),
+                chunk_count=len(manifest["chunks"]),
+                classification=1 if classification == "internal" else 2,
+                actor=current_user.id,
             )
             tx_hash = dr_res.get("tx_hash")
         except Exception:
@@ -190,6 +192,7 @@ async def list_objects(
                 "chunk_count": o.chunk_count,
                 "merkle_root": o.merkle_root,
                 "classification": o.classification,
+                "status": o.status,
                 "created_at": o.created_at,
             }
             for o in objects
@@ -328,12 +331,13 @@ async def download_object(
         "chunks": [{"id": c.id, "i": c.idx, "nonce": c.nonce, "len": c.length} for c in chunks],
     }
 
-    dek = bytes.fromhex(obj.dek_hex) if obj.dek_hex else bytes(32)
+    dek = bytes.fromhex(str(obj.dek_hex)) if obj.dek_hex else bytes(32)
     nodes = await get_live_storage_nodes(db)
 
     # Parse Range header if present: Range: bytes=start-end
     byte_start = 0
-    byte_end = obj.size - 1 if obj.size > 0 else 0
+    total_size = int(obj.size) if obj.size is not None else 0
+    byte_end: int | None = total_size - 1 if total_size > 0 else 0
     is_partial = False
 
     if range_header and range_header.startswith("bytes="):
@@ -358,7 +362,7 @@ async def download_object(
         event_type="OBJECT_READ",
         actor=current_user.id,
         subject=object_id,
-        data_hash=obj.manifest_id,
+        data_hash=str(obj.manifest_id),
         correlation_id=x_correlation_id or "download",
         details={"bytes_read": len(data), "range": range_header},
     )
@@ -408,7 +412,7 @@ async def share_object(
         event_type="OBJECT_SHARED",
         actor=current_user.id,
         subject=object_id,
-        data_hash=obj.manifest_id,
+        data_hash=str(obj.manifest_id),
         correlation_id=x_correlation_id or "share",
         details={"grantee": principal_id, "permissions": permissions},
     )
@@ -429,7 +433,7 @@ async def delete_object(
     if not obj:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Object not found")
 
-    obj.status = "TOMBSTONED"
+    setattr(obj, "status", "TOMBSTONED")
     await db.commit()
 
     # Tombstone on chain
@@ -442,11 +446,27 @@ async def delete_object(
         event_type="OBJECT_TOMBSTONED",
         actor=current_user.id,
         subject=object_id,
-        data_hash=obj.manifest_id,
+        data_hash=str(obj.manifest_id),
         correlation_id=x_correlation_id or "delete",
     )
 
     return {"status": "tombstoned", "object_id": object_id}
+
+
+@router.delete("/objects")
+async def clear_all_objects(
+    current_user: CurrentPrincipal = Depends(require("object:delete")),
+    db: AsyncSession = Depends(get_db),
+    x_correlation_id: str | None = Header(default="purge-req"),
+) -> dict[str, Any]:
+    """Purge all stored objects from the database and storage nodes."""
+    stmt = select(StoredObject)
+    objs = (await db.execute(stmt)).scalars().all()
+    count = len(objs)
+    for o in objs:
+        setattr(o, "status", "TOMBSTONED")
+    await db.commit()
+    return {"status": "purged", "count": count}
 
 
 @router.get("/objects/{object_id}/verify")

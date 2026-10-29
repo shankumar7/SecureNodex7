@@ -299,10 +299,10 @@ export const StorageHealthTab: React.FC<StorageHealthTabProps> = ({ health, node
                   <div className="space-y-1.5 pt-1">
                     <div className="flex justify-between text-[11px] font-mono-snx text-snx-muted">
                       <span>Stored Chunks:</span>
-                      <span className="text-snx-primary font-bold">{node.chunk_count} chunks</span>
+                      <span className="text-snx-primary font-bold">{(node.chunk_count ?? (node as any).chunks ?? 0)} chunks</span>
                     </div>
                     <div className="flex justify-between text-[11px] font-mono-snx text-snx-muted">
-                      <span>Capacity Allocated:</span>
+                      <span>Decentralized Data Stored:</span>
                       <span className="text-snx-primary font-bold">{usedMb} MB / 32 GB</span>
                     </div>
                     {/* Visual Progress Bar */}

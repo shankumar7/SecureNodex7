@@ -5,7 +5,7 @@ import logging
 import os
 import threading
 import time
-from typing import Any
+from typing import Any, cast
 
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
@@ -65,16 +65,16 @@ class ChainClient:
 
     def _load_operator_account(self, custom_key: str | None) -> LocalAccount:
         if custom_key:
-            return Account.from_key(custom_key)
+            return cast(LocalAccount, Account.from_key(custom_key))
 
         key_file = settings.OPERATOR_KEY_FILE
         if os.path.exists(key_file):
             with open(key_file) as f:
                 key_hex = f.read().strip()
-                return Account.from_key(key_hex)
+                return cast(LocalAccount, Account.from_key(key_hex))
 
         # Fallback to dev key
-        return Account.from_key(DEFAULT_DEV_KEY)
+        return cast(LocalAccount, Account.from_key(DEFAULT_DEV_KEY))
 
     def _find_deployments_file(self) -> str:
         candidates = [
@@ -120,7 +120,7 @@ class ChainClient:
     def is_connected(self) -> bool:
         """Check if Web3 RPC is reachable."""
         try:
-            return bool(self.w3.is_connected())
+            return self.w3.is_connected()
         except Exception:
             return False
 
@@ -159,13 +159,13 @@ class ChainClient:
                 tx_hash = self.w3.eth.send_raw_transaction(signed_tx.raw_transaction)
 
                 receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=15)
-                if receipt.status != 1:
+                if receipt["status"] != 1:
                     raise RuntimeError(f"Transaction reverted on-chain. TxHash: {tx_hash.hex()}")
 
                 return {
                     "tx_hash": tx_hash.hex(),
-                    "block_number": receipt.blockNumber,
-                    "gas_used": receipt.gasUsed,
+                    "block_number": receipt["blockNumber"],
+                    "gas_used": receipt["gasUsed"],
                     "receipt": receipt,
                 }
             except Exception as e:
@@ -216,6 +216,13 @@ class ChainClient:
             classification,
             to_bytes32(actor),
         )
+        return self._send_transaction(func)
+
+    def tombstone_object(self, object_id: str, actor: str = "admin") -> dict[str, Any]:
+        contract = self.contracts.get("DataRegistry")
+        if not contract:
+            raise RuntimeError("DataRegistry contract not loaded")
+        func = contract.functions.tombstone(to_bytes32(object_id), to_bytes32(actor))
         return self._send_transaction(func)
 
     def suspend_identity(self, identity_id: str) -> dict[str, Any]:
@@ -300,7 +307,7 @@ class ChainClient:
         contract = self.contracts.get("AuditLog")
         if not contract:
             return "0x" + "0" * 64
-        return "0x" + contract.functions.head().call().hex()
+        return str("0x" + contract.functions.head().call().hex())
 
     def get_audit_count(self) -> int:
         contract = self.contracts.get("AuditLog")
