@@ -179,7 +179,7 @@ class ChainClient:
 
     # --- IdentityRegistry ---
     def register_identity(
-        self, identity_id: str, fingerprint: str, role_mask: int, metadata_uri: str = ""
+        self, identity_id: str, fingerprint: str, role_mask: int = 1, kind: int = 0, actor: str = "admin"
     ) -> dict[str, Any]:
         contract = self.contracts.get("IdentityRegistry")
         if not contract:
@@ -187,7 +187,35 @@ class ChainClient:
 
         id_bytes = to_bytes32(identity_id)
         fp_bytes = to_bytes32(fingerprint)
-        func = contract.functions.register(id_bytes, fp_bytes, role_mask, metadata_uri)
+        meta_bytes = to_bytes32("")
+        actor_bytes = to_bytes32(actor)
+        func = contract.functions.register(id_bytes, kind, role_mask, fp_bytes, meta_bytes, actor_bytes)
+        return self._send_transaction(func)
+
+    # --- DataRegistry ---
+    def register_object(
+        self,
+        object_id: str,
+        manifest_id: str,
+        merkle_root: str,
+        size: int = 1024,
+        chunk_count: int = 4,
+        classification: int = 1,
+        actor: str = "admin",
+    ) -> dict[str, Any]:
+        contract = self.contracts.get("DataRegistry")
+        if not contract:
+            raise RuntimeError("DataRegistry contract not loaded")
+
+        func = contract.functions.registerObject(
+            to_bytes32(object_id),
+            to_bytes32(manifest_id),
+            to_bytes32(merkle_root),
+            size,
+            chunk_count,
+            classification,
+            to_bytes32(actor),
+        )
         return self._send_transaction(func)
 
     def suspend_identity(self, identity_id: str) -> dict[str, Any]:
@@ -261,7 +289,7 @@ class ChainClient:
         result = self._send_transaction(func)
 
         head_hex = "0x" + contract.functions.head().call().hex()
-        count = contract.functions.count().call()
+        count = contract.functions.seq().call() if hasattr(contract.functions, "seq") else 0
 
         result["seq"] = count
         result["prev_head"] = prev_head_hex
@@ -278,7 +306,11 @@ class ChainClient:
         contract = self.contracts.get("AuditLog")
         if not contract:
             return 0
-        return int(contract.functions.count().call())
+        if hasattr(contract.functions, "seq"):
+            return int(contract.functions.seq().call())
+        if hasattr(contract.functions, "count"):
+            return int(contract.functions.count().call())
+        return 0
 
 
 # Global chain client singleton
