@@ -1,0 +1,159 @@
+================================================================================
+                    SECURENODEX - SIMPLE PROJECT GUIDE & DEMO MANUAL
+================================================================================
+
+1. WHAT IS SECURENODEX IN PLAIN ENGLISH?
+--------------------------------------------------------------------------------
+Normally, when IoT devices (smart meters, sensors, cameras) store data, they 
+send it to a single central cloud (like AWS or Google Cloud). 
+If that central server gets hacked, leaks data, or goes down, everything fails.
+
+SecureNodeX is a "Zero-Trust, Decentralized IoT Security & Storage Platform":
+- Instead of trusting one server, data is encrypted, split into tiny chunks, 
+  and scattered across multiple physical computers and edge devices (our 
+  Raspberry Pi and teammate laptops).
+- Every device has an unforgeable cryptographic hardware identity.
+- Every event and device registration is permanently anchored onto an immutable 
+  private Blockchain so nobody can falsify history or tamper with logs.
+
+
+2. THE 3 CORE PILLARS (HOW IT WORKS)
+--------------------------------------------------------------------------------
+A. DECENTRALIZED DATA STORAGE (SNX-Store):
+   - When a file is uploaded, it is encrypted using AES-256-GCM.
+   - The encryption key is protected using ECIES (Elliptic Curve Integrated 
+     Encryption Scheme over NIST P-256).
+   - The file is broken into content-addressed chunks (SHA-256).
+   - Chunks are distributed across our cluster: Raspberry Pi, Laptop 2, 3, 4.
+   - If one laptop turns off or loses WiFi, the system automatically fetches 
+     the surviving replica from another node without failing.
+
+B. HARDWARE IDENTITY & PKI (Zero-Trust):
+   - Devices do not use passwords. They use Elliptic Curve Cryptography (ECC) 
+     NIST P-256 (secp256r1) keypairs.
+   - Each device has an X.509 certificate issued by our internal CA.
+   - Communication uses mutual TLS (mTLS) - both client and server prove identity.
+
+C. BLOCKCHAIN AUDIT TRAIL (Chain ID: 20260):
+   - We run a private EVM blockchain network.
+   - Every file hash, device identity, and tamper alert is logged in our 
+     deployed Smart Contracts (AuditLog, IdentityRegistry, DataRegistry).
+   - The log forms an immutable Keccak-256 rolling hash chain that can be 
+     verified back to the Genesis block.
+
+
+3. WHERE IS ELLIPTIC CURVE CRYPTOGRAPHY (ECC) USED?
+--------------------------------------------------------------------------------
+If the jury asks: "Show me where ECC is used":
+1. Device Identity & PKI: 
+   - Curve: NIST P-256 (secp256r1)
+   - Code: pki/ca_core.py
+   - Purpose: Hardware private keys and X.509 device certificates.
+2. User Authentication (JWT):
+   - Curve: NIST P-256 (ES256 ECDSA)
+   - Code: backend/app/auth/security.py
+   - Purpose: Asymmetric digital signatures on login tokens instead of symmetric secrets.
+3. Storage Key Wrapping (ECIES):
+   - Curve: NIST P-256 (ECDH key exchange + HKDF)
+   - Code: backend/app/storage/crypto.py
+   - Purpose: Wraps the AES-256 data key for recipients.
+4. Blockchain Transactions:
+   - Curve: secp256k1 (EVM standard)
+   - Code: backend/app/chain/client.py
+   - Purpose: Signs all blockchain transactions (r, s, v signatures).
+
+
+4. ROLES OF EACH DEVICE IN TODAY'S DEMO
+--------------------------------------------------------------------------------
+- Laptop 1 (Mac / Master Controller):
+  * IP: 10.120.11.70
+  * Runs: Dashboard UI (:3000), API Server (:8443), Primary Blockchain Node (:8545).
+
+- Raspberry Pi (Physical IoT Edge Storage Node):
+  * IP: 10.120.11.183
+  * Runs: snx-storage daemon on port 7443. Holds real chunks on its SD card.
+
+- Laptop 2, 3, 4 (Decentralized Storage Nodes + QBFT Validators):
+  * Laptop 2: 10.120.11.212
+  * Laptop 3: 10.120.11.171
+  * Laptop 4: 10.120.11.158
+  * Each runs a decentralized storage daemon and Besu validator peering over P2P :30303.
+
+- Laptop 5 (Blockchain Auditor / Inspector):
+  * IP: 10.120.11.242
+  * Runs live block inspection tools against the blockchain.
+
+- Laptop 6 (QA & Chaos Security Demonstrator):
+  * Fires attack scripts (chunk tampering, flood) to prove cluster defense.
+
+
+================================================================================
+5. STEP-BY-STEP LIVE DEMO SCRIPT FOR THE JURY
+================================================================================
+
+--- STEP 1: SHOW THE DASHBOARD & LIVE CLUSTER STATUS ---
+1. Open browser on Laptop 1: http://localhost:3000
+2. Point out to the jury:
+   - Top Bar: "Chain ID: 20260 (Besu QBFT)" showing live blockchain connection.
+   - Go to "Decentralized Storage" tab:
+     Show the Cluster Node list. Point to "storage-pi" (Raspberry Pi) and the 
+     laptop storage nodes marked "UP".
+   - Say:
+     "Notice that our storage cluster is not a mock; it includes a physical 
+      Raspberry Pi at 10.120.11.183 and multiple teammate laptops over our WiFi."
+
+--- STEP 2: LIVE FILE UPLOAD & MULTI-DEVICE SPLITTING ---
+1. In the "Decentralized Storage" tab, click "Upload Object".
+2. Choose a file (e.g., sample PDF or text document) and click Upload.
+3. The dashboard will show:
+   - The file was encrypted with AES-256-GCM.
+   - The Data Encryption Key was wrapped using ECIES.
+   - The file was sliced into chunks, and each chunk is replicated across nodes.
+4. Click on the uploaded file to view "Chunk Placements". Show the jury that 
+   chunk replicas are placed on both the Raspberry Pi and the laptops.
+
+--- STEP 3: PROVE THE CHUNKS PHYSICALLY REACHED THE RASPBERRY PI ---
+1. Open your terminal connected to the Raspberry Pi:
+     ssh shankumar@10.120.11.183
+2. Run:
+     ls -la ~/storage_data
+3. Show the jury:
+   "Here are the SHA-256 content-addressed chunk files stored physically 
+    on the Raspberry Pi's SD card."
+
+--- STEP 4: PROVE THE BLOCKCHAIN & AUDIT TRAIL ---
+1. On the Dashboard, click the "Audit Timeline" tab.
+2. Show the rolling list of events (OBJECT_CREATE, LOGIN, DEVICE_HEARTBEAT).
+3. Click the green button: "Verify Hash Chain".
+4. The dashboard will re-calculate every Keccak-256 hash from Genesis and display:
+   "Cryptographic Audit Chain Intact: All events verified from genesis."
+5. To show the raw blockchain blocks in terminal, run on Laptop 1:
+     python3 tools/show_block.py
+   Show the jury:
+   - Current Block Height (e.g. Block #6)
+   - Current Block Hash & Parent Hash (the chain link)
+   - Target Smart Contract: IdentityRegistry / AuditLog
+   - The ECDSA (r, s, v) signature using the secp256k1 curve.
+
+--- STEP 5: PROVE ATTACK RESILIENCE (CHAOS TESTING) ---
+1. Ask Laptop 6 to run:
+     python tools/chaos/tamper.py
+2. This script secretly alters 1 single byte inside a stored chunk.
+3. Click "Verify Object" on the Dashboard.
+4. The Merkle root check immediately detects the tamper and raises an alert!
+   Say to the jury:
+   "Even if an attacker gains root access to a storage node and tampers with a 
+    file chunk, our Merkle tree verification detects it instantly and discards 
+    the corrupt replica."
+
+--- STEP 6: DOWNLOAD & HIGH AVAILABILITY ---
+1. In the Dashboard, click "Download" next to the uploaded document.
+2. The file downloads, decrypts, and opens cleanly on your laptop!
+3. Explain to the jury:
+   "Even if any individual storage node goes offline or loses power, our 
+    system seamlessly fails over to the surviving replicas, ensuring 100% 
+    availability without single points of failure."
+
+================================================================================
+                              END OF GUIDE
+================================================================================
