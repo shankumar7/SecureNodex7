@@ -23,7 +23,9 @@ def device_keypair():
 
 
 @pytest.mark.asyncio
-async def test_gateway_pipeline_full_matrix(db_session: AsyncSession, device_keypair: tuple[Any, Any]) -> None:
+async def test_gateway_pipeline_full_matrix(
+    db_session: AsyncSession, device_keypair: tuple[Any, Any]
+) -> None:
     priv_key, pub_key = device_keypair
     device_id = "d-0a1b2c3d4e5f6071"
     topic = f"snx/v1/dev/{device_id}/telemetry"
@@ -70,7 +72,9 @@ async def test_gateway_pipeline_full_matrix(db_session: AsyncSession, device_key
 
     bad_ver_env = dict(env1)
     bad_ver_env["v"] = 2
-    ok, _, reason = await pipeline.verify_envelope(json.dumps(bad_ver_env).encode(), topic, db_session)
+    ok, _, reason = await pipeline.verify_envelope(
+        json.dumps(bad_ver_env).encode(), topic, db_session
+    )
     assert ok is False
     assert reason == "MALFORMED"
 
@@ -90,7 +94,9 @@ async def test_gateway_pipeline_full_matrix(db_session: AsyncSession, device_key
     await db_session.commit()
     pipeline.invalidate_cache(device_id)
 
-    env2 = sign_device_message(priv_key, device_id, seq=2, timestamp=now_ts, msg_type="tel", payload={"temp": 20})
+    env2 = sign_device_message(
+        priv_key, device_id, seq=2, timestamp=now_ts, msg_type="tel", payload={"temp": 20}
+    )
     ok, _, reason = await pipeline.verify_envelope(
         raw_bytes=json.dumps(env2).encode(),
         topic=topic,
@@ -107,7 +113,9 @@ async def test_gateway_pipeline_full_matrix(db_session: AsyncSession, device_key
     pipeline.invalidate_cache(device_id)
 
     # --- 5. Check 4: Timestamp Out-of-Window (TIMESTAMP_OUT_OF_WINDOW) ---
-    env_old = sign_device_message(priv_key, device_id, seq=3, timestamp=now_ts - 500, msg_type="tel", payload={"temp": 20})
+    env_old = sign_device_message(
+        priv_key, device_id, seq=3, timestamp=now_ts - 500, msg_type="tel", payload={"temp": 20}
+    )
     ok, _, reason = await pipeline.verify_envelope(
         raw_bytes=json.dumps(env_old).encode(),
         topic=topic,
@@ -131,7 +139,9 @@ async def test_gateway_pipeline_full_matrix(db_session: AsyncSession, device_key
     assert reason == "REPLAY_REJECTED"
 
     # --- 7. Check 6: Tampered Payload / Signature (SIGNATURE_INVALID - AT-10) ---
-    env_tampered = sign_device_message(priv_key, device_id, seq=4, timestamp=now_ts, msg_type="tel", payload={"temp": 20})
+    env_tampered = sign_device_message(
+        priv_key, device_id, seq=4, timestamp=now_ts, msg_type="tel", payload={"temp": 20}
+    )
     env_tampered["p"] = "eyJ0ZW1wX2MiOjk5OS45fQ"  # Modifying payload after signing
     ok, _, reason = await pipeline.verify_envelope(
         raw_bytes=json.dumps(env_tampered).encode(),
@@ -147,7 +157,9 @@ async def test_gateway_pipeline_full_matrix(db_session: AsyncSession, device_key
     pipeline.rate_limits[device_id] = []
     # Send 5 messages in current second
     for s in range(5, 10):
-        e = sign_device_message(priv_key, device_id, seq=s, timestamp=now_ts, msg_type="tel", payload={"s": s})
+        e = sign_device_message(
+            priv_key, device_id, seq=s, timestamp=now_ts, msg_type="tel", payload={"s": s}
+        )
         ok, _, reason = await pipeline.verify_envelope(
             raw_bytes=json.dumps(e).encode(),
             topic=topic,
@@ -158,7 +170,9 @@ async def test_gateway_pipeline_full_matrix(db_session: AsyncSession, device_key
         assert ok is True
 
     # 6th message in same second must be rate-limited
-    e_excess = sign_device_message(priv_key, device_id, seq=10, timestamp=now_ts, msg_type="tel", payload={"s": 10})
+    e_excess = sign_device_message(
+        priv_key, device_id, seq=10, timestamp=now_ts, msg_type="tel", payload={"s": 10}
+    )
     ok, _, reason = await pipeline.verify_envelope(
         raw_bytes=json.dumps(e_excess).encode(),
         topic=topic,

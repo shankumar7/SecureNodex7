@@ -31,20 +31,25 @@ from storage.app.config import storage_settings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("snx-storage")
 
+
 def get_or_create_gauge(name: str, desc: str, labels: list[str]) -> Gauge:
     if name in REGISTRY._names_to_collectors:
         return REGISTRY._names_to_collectors[name]  # type: ignore
     return Gauge(name, desc, labels)
+
 
 def get_or_create_counter(name: str, desc: str, labels: list[str]) -> Counter:
     if name in REGISTRY._names_to_collectors:
         return REGISTRY._names_to_collectors[name]  # type: ignore
     return Counter(name, desc, labels)
 
+
 STORAGE_CHUNKS_TOTAL = get_or_create_gauge(
     "snx_storage_chunks_total", "Total chunks stored on this node", ["node_id"]
 )
-STORAGE_BYTES = get_or_create_gauge("snx_storage_bytes", "Total storage bytes used on this node", ["node_id"])
+STORAGE_BYTES = get_or_create_gauge(
+    "snx_storage_bytes", "Total storage bytes used on this node", ["node_id"]
+)
 STORAGE_OPERATIONS = get_or_create_counter(
     "snx_storage_operations_total", "Storage chunk operations count", ["node_id", "op", "status"]
 )
@@ -230,7 +235,9 @@ async def put_chunk(
     """Store chunk atomically with SHA-256 verification (AT-13)."""
     norm_id = chunk_id.strip().lower()
     if len(norm_id) != 64:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid chunk ID length")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid chunk ID length"
+        )
 
     body = await request.body()
     actual_hash = hashlib.sha256(body).hexdigest().lower()
@@ -258,7 +265,9 @@ async def get_chunk(chunk_id: str) -> FileResponse:
     """Stream stored chunk bytes."""
     norm_id = chunk_id.strip().lower()
     if not store.has_chunk(norm_id):
-        STORAGE_OPERATIONS.labels(node_id=storage_settings.NODE_ID, op="get", status="not_found").inc()
+        STORAGE_OPERATIONS.labels(
+            node_id=storage_settings.NODE_ID, op="get", status="not_found"
+        ).inc()
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chunk not found")
 
     path = store.get_chunk_path(norm_id)
@@ -322,7 +331,9 @@ async def replicate_chunk(req: ReplicateRequest) -> dict[str, Any]:
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Replication failed: {e}") from e
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Replication failed: {e}"
+        ) from e
 
 
 @app.get("/v1/inventory", response_model=InventoryResponse)
@@ -347,7 +358,9 @@ async def get_inventory(
         for k in page_keys
     ]
 
-    next_cur = page_keys[-1] if len(page_keys) == limit and (start_idx + limit < len(all_keys)) else None
+    next_cur = (
+        page_keys[-1] if len(page_keys) == limit and (start_idx + limit < len(all_keys)) else None
+    )
     return InventoryResponse(
         items=items,
         next_cursor=next_cur,

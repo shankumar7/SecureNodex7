@@ -136,7 +136,9 @@ class BatchManager:
         async with self._lock:
             self.buffer.append(envelope)
             now = time.time()
-            if len(self.buffer) >= self.max_messages or (now - self.last_flush_time >= self.max_seconds):
+            if len(self.buffer) >= self.max_messages or (
+                now - self.last_flush_time >= self.max_seconds
+            ):
                 return await self._flush_unlocked(db, nodes)
         return None
 

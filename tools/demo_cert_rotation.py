@@ -6,9 +6,9 @@ Per docs/02_SECURITY_PKI.md (Section 6) & docs/10_TESTING_DEMO.md (AT-22).
 
 import asyncio
 import json
-from pathlib import Path
 import sys
 import time
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -34,7 +34,7 @@ async def main() -> None:
     priv_key_1 = ec.generate_private_key(ec.SECP256R1(), default_backend())
     pub_key_1 = priv_key_1.public_key()
     fp_1 = compute_public_key_fingerprint(pub_key_1)
-    print(f"\n[1] Initial Keypair & Certificate Provisioned:")
+    print("\n[1] Initial Keypair & Certificate Provisioned:")
     print(f"    - SHA-256 SPKI Fingerprint: {fp_1}")
 
     pipeline = GatewayPipeline()
@@ -61,11 +61,11 @@ async def main() -> None:
     assert ok1 is True
 
     # Step 3: Certificate Auto-Renewal (New Keypair / CSR over mTLS via /v1/enroll/renew)
-    print(f"\n[3] Expiry threshold reached -> Executing /v1/enroll/renew rotation flow...")
+    print("\n[3] Expiry threshold reached -> Executing /v1/enroll/renew rotation flow...")
     priv_key_2 = ec.generate_private_key(ec.SECP256R1(), default_backend())
     pub_key_2 = priv_key_2.public_key()
     fp_2 = compute_public_key_fingerprint(pub_key_2)
-    print(f"    -> Renewal Success! New Certificate Issued by Intermediate CA.")
+    print("    -> Renewal Success! New Certificate Issued by Intermediate CA.")
     print(f"    -> New SPKI Fingerprint: {fp_2}")
     print(f"    -> On-chain IdentityRegistry.rotate({device_id}, {fp_2[:16]}...) executed.")
 

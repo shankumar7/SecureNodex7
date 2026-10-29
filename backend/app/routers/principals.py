@@ -92,7 +92,9 @@ async def get_principal(
 ) -> PrincipalResponse:
     """Get principal details (scoped: own profile, or Admin/Manager/Auditor)."""
     is_own = current_user.id == principal_id
-    if not is_own and not (current_user.is_admin() or current_user.is_manager() or current_user.is_auditor()):
+    if not is_own and not (
+        current_user.is_admin() or current_user.is_manager() or current_user.is_auditor()
+    ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
 
     stmt = select(Principal).where(Principal.id == principal_id)

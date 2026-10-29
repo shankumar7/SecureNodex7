@@ -57,6 +57,7 @@ async def test_batcher_merkle_and_proofs(
 
     # 4. Flush Batch using BatchManager
     from unittest.mock import patch
+
     batcher = BatchManager(max_messages=5, max_seconds=100.0)
 
     async def mock_upload(data, name, mime, owner_id, classification, nodes):

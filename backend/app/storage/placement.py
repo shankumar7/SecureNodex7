@@ -31,8 +31,7 @@ def place_chunk(
 ) -> list[StorageNodeInfo]:
     """Rendezvous (HRW) placement hashing."""
     eligible = [
-        n for n in nodes
-        if n.state == "UP" and not n.draining and n.free_bytes >= min_free_bytes
+        n for n in nodes if n.state == "UP" and not n.draining and n.free_bytes >= min_free_bytes
     ]
     if not eligible:
         return []
@@ -52,8 +51,7 @@ def rank_all_nodes(
 ) -> list[StorageNodeInfo]:
     """Return all eligible nodes ranked by HRW score for fallback/repair."""
     eligible = [
-        n for n in nodes
-        if n.state == "UP" and not n.draining and n.free_bytes >= min_free_bytes
+        n for n in nodes if n.state == "UP" and not n.draining and n.free_bytes >= min_free_bytes
     ]
     return sorted(
         eligible,

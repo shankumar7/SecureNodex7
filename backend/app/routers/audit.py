@@ -33,7 +33,9 @@ async def list_audit_events(
 
     # Scoped access for normal users
     if not (current_user.is_admin() or current_user.is_auditor() or current_user.is_manager()):
-        stmt = stmt.where((AuditEvent.actor_id == current_user.id) | (AuditEvent.subject_id == current_user.id))
+        stmt = stmt.where(
+            (AuditEvent.actor_id == current_user.id) | (AuditEvent.subject_id == current_user.id)
+        )
 
     if event_type:
         stmt = stmt.where(AuditEvent.event_type == event_type)
@@ -82,6 +84,3 @@ async def verify_audit_log(
         on_chain_head=res.get("on_chain_head"),
         tampered_index=res.get("tampered_index"),
     )
-
-
-

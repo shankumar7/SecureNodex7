@@ -6,9 +6,9 @@ Injects modified payload with original signature; verifies gateway rejects with 
 import argparse
 import asyncio
 import json
-from pathlib import Path
 import sys
 import time
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
@@ -42,7 +42,9 @@ async def main() -> None:
     # Tamper payload while preserving original signature
     tampered_env = json.loads(json.dumps(valid_env))
     tampered_env["p"] = {"temperature": 999.9, "unit": "C", "malicious": True}
-    print(f"\n[CHAOS] Tampered Envelope (Payload modified, original signature kept):\n{json.dumps(tampered_env, indent=2)}")
+    print(
+        f"\n[CHAOS] Tampered Envelope (Payload modified, original signature kept):\n{json.dumps(tampered_env, indent=2)}"
+    )
 
     pipeline = GatewayPipeline()
     topic = f"snx/v1/dev/{args.device_id}/telemetry"

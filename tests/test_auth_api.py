@@ -38,7 +38,9 @@ def test_es256_jwt_token() -> None:
 
 
 @pytest.mark.asyncio
-async def test_auth_login_refresh_logout_flow(db_session: AsyncSession, async_client: AsyncClient) -> None:
+async def test_auth_login_refresh_logout_flow(
+    db_session: AsyncSession, async_client: AsyncClient
+) -> None:
     # Seed an active user
     admin_user = Principal(
         id="did:snx:admin1",

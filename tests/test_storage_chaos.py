@@ -34,16 +34,15 @@ class MockStorageNodeServer:
 @pytest.fixture
 def cluster_5_nodes():
     temp_dir = tempfile.mkdtemp(prefix="snx_chaos_cluster_")
-    nodes = [
-        MockStorageNodeServer(f"storage-{i}", temp_dir)
-        for i in range(1, 6)
-    ]
+    nodes = [MockStorageNodeServer(f"storage-{i}", temp_dir) for i in range(1, 6)]
     yield nodes
     shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 @pytest.mark.asyncio
-async def test_multi_node_upload_and_chaos_scenarios(cluster_5_nodes: list[MockStorageNodeServer]) -> None:
+async def test_multi_node_upload_and_chaos_scenarios(
+    cluster_5_nodes: list[MockStorageNodeServer],
+) -> None:
     # Build custom coordinator with mocked HTTP calls intercepted
     coordinator = StorageCoordinator(chunk_size=1024, replication_r=3, write_quorum_w=2)
     node_map = {n.node_id: n for n in cluster_5_nodes}
@@ -117,6 +116,7 @@ async def test_multi_node_upload_and_chaos_scenarios(cluster_5_nodes: list[MockS
                         break
             assert ciphertext is not None, f"Chunk {cid} lost"
             from backend.app.storage.crypto import decrypt_chunk
+
             dec = decrypt_chunk(dek, ciphertext, c["nonce"], manifest["object_id"], c["i"])
             full_bytes.extend(dec)
         return bytes(full_bytes)

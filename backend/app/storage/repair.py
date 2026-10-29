@@ -117,7 +117,9 @@ class StorageRepairWorker:
                                     db.add(new_rep)
                                     repaired_count += 1
                             except Exception as e:
-                                logger.debug(f"Replication failed for chunk {chunk.id[:8]} to {target.id}: {e}")
+                                logger.debug(
+                                    f"Replication failed for chunk {chunk.id[:8]} to {target.id}: {e}"
+                                )
 
         if repaired_count > 0:
             await db.commit()

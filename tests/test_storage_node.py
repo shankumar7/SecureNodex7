@@ -17,6 +17,7 @@ def temp_storage_dir():
     old_dir = storage_settings.STORAGE_DIR
     storage_settings.STORAGE_DIR = temp_dir
     from storage.app.main import store
+
     store.base_dir = temp_dir
     store.inventory = {}
     yield temp_dir
@@ -47,7 +48,7 @@ async def test_storage_node_put_get_head_delete(temp_storage_dir: str) -> None:
 
         # 3. PUT with hash mismatch -> must be rejected with 422
         bad_res = await client.put(
-            f"/v1/chunks/{'a'*64}",
+            f"/v1/chunks/{'a' * 64}",
             content=data,
         )
         assert bad_res.status_code == 422

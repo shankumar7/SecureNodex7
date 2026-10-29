@@ -15,7 +15,9 @@ test_engine = create_async_engine(
     poolclass=StaticPool,
     echo=False,
 )
-TestingSessionLocal = async_sessionmaker(bind=test_engine, class_=AsyncSession, expire_on_commit=False)
+TestingSessionLocal = async_sessionmaker(
+    bind=test_engine, class_=AsyncSession, expire_on_commit=False
+)
 
 
 @pytest.fixture

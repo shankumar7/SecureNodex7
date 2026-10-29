@@ -35,14 +35,18 @@ class Principal(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)
     updated_at = Column(DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now)
 
-    refresh_tokens = relationship("RefreshToken", back_populates="principal", cascade="all, delete-orphan")
+    refresh_tokens = relationship(
+        "RefreshToken", back_populates="principal", cascade="all, delete-orphan"
+    )
 
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
     id = Column(String(64), primary_key=True, default=lambda: str(uuid.uuid4()))
-    principal_id = Column(String(128), ForeignKey("principals.id", ondelete="CASCADE"), nullable=False, index=True)
+    principal_id = Column(
+        String(128), ForeignKey("principals.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     token_hash = Column(String(64), unique=True, nullable=False, index=True)  # SHA-256 hex
     expires_at = Column(DateTime(timezone=True), nullable=False)
     revoked_at = Column(DateTime(timezone=True), nullable=True)
@@ -57,7 +61,9 @@ class Device(Base):
     id = Column(String(128), primary_key=True, index=True)  # did:snx:device:...
     label = Column(String(128), nullable=False)
     device_type = Column(String(64), nullable=False, default="generic")
-    status = Column(String(32), nullable=False, default="PENDING")  # PENDING, ACTIVE, SUSPENDED, REVOKED
+    status = Column(
+        String(32), nullable=False, default="PENDING"
+    )  # PENDING, ACTIVE, SUSPENDED, REVOKED
     enrollment_token = Column(String(128), nullable=True, index=True)
     enrollment_token_expires_at = Column(DateTime(timezone=True), nullable=True)
     spki_fingerprint = Column(String(64), nullable=True, index=True)
@@ -146,7 +152,9 @@ class StoredChunk(Base):
     __tablename__ = "stored_chunks"
 
     id = Column(String(64), primary_key=True)  # SHA-256 of ciphertext
-    object_id = Column(String(64), ForeignKey("stored_objects.id", ondelete="CASCADE"), nullable=False, index=True)
+    object_id = Column(
+        String(64), ForeignKey("stored_objects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     idx = Column(Integer, nullable=False)
     length = Column(Integer, nullable=False)
     kind = Column(String(32), nullable=False, default="data")
@@ -158,9 +166,15 @@ class ChunkReplica(Base):
     __tablename__ = "chunk_replicas"
 
     id = Column(String(64), primary_key=True, default=lambda: str(uuid.uuid4()))
-    chunk_id = Column(String(64), ForeignKey("stored_chunks.id", ondelete="CASCADE"), nullable=False, index=True)
-    node_id = Column(String(64), ForeignKey("storage_nodes.id", ondelete="CASCADE"), nullable=False, index=True)
-    state = Column(String(32), nullable=False, default="stored")  # pending, stored, corrupt, missing
+    chunk_id = Column(
+        String(64), ForeignKey("stored_chunks.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    node_id = Column(
+        String(64), ForeignKey("storage_nodes.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    state = Column(
+        String(32), nullable=False, default="stored"
+    )  # pending, stored, corrupt, missing
     verified_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)
 
@@ -169,7 +183,9 @@ class ObjectGrant(Base):
     __tablename__ = "object_grants"
 
     id = Column(String(64), primary_key=True, default=lambda: str(uuid.uuid4()))
-    object_id = Column(String(64), ForeignKey("stored_objects.id", ondelete="CASCADE"), nullable=False, index=True)
+    object_id = Column(
+        String(64), ForeignKey("stored_objects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     grantee_id = Column(String(128), nullable=False, index=True)
     grant_blob_id = Column(String(64), nullable=False)
     permissions = Column(Integer, nullable=False, default=1)  # 1=READ, 2=WRITE

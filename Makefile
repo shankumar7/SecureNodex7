@@ -55,8 +55,8 @@ simulate:
 	@python3 -m simulator.main --devices $(or $(DEVICES),100) --rate $(or $(RATE),1.0) --duration $(or $(DURATION),5.0)
 
 demo:
-	@echo "Starting SecureNodeX Full Rehearsal..."
-	@bash tools/smoke.sh 2>/dev/null || echo "Demo script ready"
+	@echo "Starting SecureNodeX Full Platform Demonstration..."
+	@PYTHONPATH=. python3 tools/seed_demo.py
 
 clean-secrets:
 	@echo "WARNING: This will remove all local generated keys, certs, and test data!"

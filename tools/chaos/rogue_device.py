@@ -7,9 +7,9 @@ import argparse
 import asyncio
 import datetime
 import json
-from pathlib import Path
 import sys
 import time
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
@@ -26,10 +26,12 @@ from backend.app.message_core import sign_device_message
 def create_rogue_certificate(device_id: str) -> tuple[ec.EllipticCurvePrivateKey, str]:
     """Generate a self-signed P-256 certificate signed by an unknown root."""
     rogue_ca_key = ec.generate_private_key(ec.SECP256R1(), default_backend())
-    subject = issuer = x509.Name([
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Rogue Unofficial CA"),
-        x509.NameAttribute(NameOID.COMMON_NAME, device_id),
-    ])
+    subject = issuer = x509.Name(
+        [
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Rogue Unofficial CA"),
+            x509.NameAttribute(NameOID.COMMON_NAME, device_id),
+        ]
+    )
     cert = (
         x509.CertificateBuilder()
         .subject_name(subject)
@@ -44,7 +46,9 @@ def create_rogue_certificate(device_id: str) -> tuple[ec.EllipticCurvePrivateKey
 
 
 async def main() -> None:
-    parser = argparse.ArgumentParser(description="Simulate rogue device connection with untrusted CA certificate")
+    parser = argparse.ArgumentParser(
+        description="Simulate rogue device connection with untrusted CA certificate"
+    )
     parser.add_argument("--device-id", default="device-rogue-01", help="Rogue device ID")
     args = parser.parse_args()
 
@@ -64,7 +68,7 @@ async def main() -> None:
 
     pipeline = GatewayPipeline()
     # Attempting to publish to another device's topic or without registered identity
-    topic = f"snx/v1/dev/legitimate-device-99/telemetry"  # Topic hijacking attempt
+    topic = "snx/v1/dev/legitimate-device-99/telemetry"  # Topic hijacking attempt
     raw = json.dumps(env).encode("utf-8")
 
     print("[CHAOS] Attempting ingestion into gateway pipeline...")

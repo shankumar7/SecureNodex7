@@ -54,10 +54,7 @@ def test_ecies_dek_wrapping_and_unwrapping() -> None:
 
 
 def test_merkle_tree_and_proof_verification() -> None:
-    chunk_ids = [
-        hashlib.sha256(f"chunk_{i}".encode()).hexdigest()
-        for i in range(5)
-    ]
+    chunk_ids = [hashlib.sha256(f"chunk_{i}".encode()).hexdigest() for i in range(5)]
 
     root = compute_merkle_root(chunk_ids)
     assert len(root) == 64
@@ -73,10 +70,7 @@ def test_merkle_tree_and_proof_verification() -> None:
 
 
 def test_hrw_placement_and_diversity_rule() -> None:
-    nodes = [
-        StorageNodeInfo(id=f"node-{i}", endpoint=f"http://node-{i}:7443")
-        for i in range(1, 6)
-    ]
+    nodes = [StorageNodeInfo(id=f"node-{i}", endpoint=f"http://node-{i}:7443") for i in range(1, 6)]
     chunk_1 = "1" * 64
     chunk_2 = "2" * 64
 

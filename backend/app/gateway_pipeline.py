@@ -21,7 +21,9 @@ class GatewayPipeline:
     def __init__(self, max_message_size: int = 1024, timestamp_window_s: int = 300) -> None:
         self.max_size = max_message_size
         self.window_s = timestamp_window_s
-        self.device_cache: dict[str, tuple[str, str | None, ec.EllipticCurvePublicKey | None, float]] = {}  # did -> (status, fp, pub_key, cached_at)
+        self.device_cache: dict[
+            str, tuple[str, str | None, ec.EllipticCurvePublicKey | None, float]
+        ] = {}  # did -> (status, fp, pub_key, cached_at)
         self.last_seq: dict[str, int] = {}
         self.rate_limits: dict[str, list[float]] = {}  # did -> list of timestamps in current second
 

@@ -40,7 +40,9 @@ def ensure_ca_credentials(ca_dir: str | Path = "pki/intermediate") -> tuple[byte
 
     # Generate ephemeral root & intermediate
     root_key, root_cert = create_root_ca(common_name="SecureNodeX Root CA")
-    inter_key, inter_cert = create_intermediate_ca(root_key, root_cert, common_name="SecureNodeX Intermediate CA")
+    inter_key, inter_cert = create_intermediate_ca(
+        root_key, root_cert, common_name="SecureNodeX Intermediate CA"
+    )
 
     ca_key_bytes = private_key_to_pem(inter_key)
     ca_cert_bytes = inter_cert.public_bytes(serialization.Encoding.PEM)
@@ -116,18 +118,20 @@ def batch_provision_devices(
         }
         config_file.write_text(json.dumps(config_data, indent=2), encoding="utf-8")
 
-        provisioned.append({
-            "device_id": device_id,
-            "principal_id": principal_id,
-            "label": label,
-            "fingerprint": fingerprint,
-            "bundle_dir": str(dev_dir),
-            "key_file": str(key_file),
-            "cert_file": str(cert_file),
-            "chain_file": str(chain_file),
-            "config_file": str(config_file),
-            "private_key": device_key,
-            "certificate": device_cert,
-        })
+        provisioned.append(
+            {
+                "device_id": device_id,
+                "principal_id": principal_id,
+                "label": label,
+                "fingerprint": fingerprint,
+                "bundle_dir": str(dev_dir),
+                "key_file": str(key_file),
+                "cert_file": str(cert_file),
+                "chain_file": str(chain_file),
+                "config_file": str(config_file),
+                "private_key": device_key,
+                "certificate": device_cert,
+            }
+        )
 
     return provisioned

@@ -84,7 +84,11 @@ class AuditService:
 
         # If not recorded on-chain, calculate local sequential hash chain
         if seq is None or head is None:
-            stmt = select(AuditEvent).order_by(AuditEvent.timestamp.desc(), AuditEvent.created_at.desc()).limit(1)
+            stmt = (
+                select(AuditEvent)
+                .order_by(AuditEvent.timestamp.desc(), AuditEvent.created_at.desc())
+                .limit(1)
+            )
             last_event = (await db.execute(stmt)).scalar_one_or_none()
             if last_event and last_event.head:
                 prev_head = last_event.head

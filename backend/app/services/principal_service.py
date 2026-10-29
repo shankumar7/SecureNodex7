@@ -21,9 +21,13 @@ class PrincipalService:
 
     async def get_active_admin_count(self, db: AsyncSession) -> int:
         """Count how many active administrators exist."""
-        stmt = select(func.count()).select_from(Principal).where(
-            Principal.status == "ACTIVE",
-            Principal.roles_mask.bitwise_and(RoleBit.ADMIN.value) > 0,
+        stmt = (
+            select(func.count())
+            .select_from(Principal)
+            .where(
+                Principal.status == "ACTIVE",
+                Principal.roles_mask.bitwise_and(RoleBit.ADMIN.value) > 0,
+            )
         )
         return int((await db.execute(stmt)).scalar_one() or 0)
 

@@ -155,7 +155,9 @@ async def get_device(
 ) -> DeviceResponse:
     """Get device details."""
     is_self = current_user.id == device_id
-    if not is_self and not (current_user.is_admin() or current_user.is_manager() or current_user.is_auditor()):
+    if not is_self and not (
+        current_user.is_admin() or current_user.is_manager() or current_user.is_auditor()
+    ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
 
     stmt = select(Device).where(Device.id == device_id)

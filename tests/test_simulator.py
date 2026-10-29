@@ -184,7 +184,9 @@ async def test_simulator_load_runner(db_session: AsyncSession) -> None:
 
 
 @pytest.mark.asyncio
-async def test_simulator_certificate_renewal_flow(db_session: AsyncSession, async_client: AsyncClient) -> None:
+async def test_simulator_certificate_renewal_flow(
+    db_session: AsyncSession, async_client: AsyncClient
+) -> None:
     """Test automated certificate renewal flow (/v1/enroll/renew) per docs/08 & AT-22."""
     with tempfile.TemporaryDirectory() as tmp_dir:
         # Provision initial device bundle

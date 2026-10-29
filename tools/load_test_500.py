@@ -8,10 +8,10 @@ Per docs/10_TESTING_DEMO.md (Section 5 & AT-24).
 import argparse
 import asyncio
 import json
-from pathlib import Path
 import statistics
 import sys
 import time
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -72,14 +72,22 @@ async def run_device_worker(
 
 
 async def main() -> None:
-    parser = argparse.ArgumentParser(description="Run 500-device concurrent load test for SecureNodeX (AT-24)")
-    parser.add_argument("--num-devices", type=int, default=500, help="Number of virtual devices (default: 500)")
-    parser.add_argument("--msgs-per-device", type=int, default=10, help="Messages per device (default: 10)")
+    parser = argparse.ArgumentParser(
+        description="Run 500-device concurrent load test for SecureNodeX (AT-24)"
+    )
+    parser.add_argument(
+        "--num-devices", type=int, default=500, help="Number of virtual devices (default: 500)"
+    )
+    parser.add_argument(
+        "--msgs-per-device", type=int, default=10, help="Messages per device (default: 10)"
+    )
     args = parser.parse_args()
 
     total_target_msgs = args.num_devices * args.msgs_per_device
     print("================================================================================")
-    print(f"      SecureNodeX AT-24: {args.num_devices}-Device Concurrent Ingestion Load Test       ")
+    print(
+        f"      SecureNodeX AT-24: {args.num_devices}-Device Concurrent Ingestion Load Test       "
+    )
     print("================================================================================")
     print(f"[*] Number of Devices: {args.num_devices}")
     print(f"[*] Messages per Device: {args.msgs_per_device}")
@@ -94,7 +102,9 @@ async def main() -> None:
         dev = VirtualDevice(device_id=f"dev-load-{i:04d}", private_key=priv)
         dev_pairs.append((dev, priv.public_key()))
 
-    print(f"[*] Initialized {len(dev_pairs)} device keypairs in {time.perf_counter() - t_start_gen:.2f}s.")
+    print(
+        f"[*] Initialized {len(dev_pairs)} device keypairs in {time.perf_counter() - t_start_gen:.2f}s."
+    )
 
     pipeline = GatewayPipeline()
     # For load test with 10 msgs in 0.5s burst per device, allow up to 20 msg/s per device limit
@@ -143,7 +153,9 @@ async def main() -> None:
     print(f"  Max:                 {max_lat:.2f} ms")
     print("--------------------------------------------------------------------------------")
 
-    assert total_accepted == total_target_msgs, f"Expected {total_target_msgs} accepted, got {total_accepted}"
+    assert total_accepted == total_target_msgs, (
+        f"Expected {total_target_msgs} accepted, got {total_accepted}"
+    )
     assert loss_rate == 0.0, "Zero message loss required for AT-24"
     assert p95 < 50.0, f"p95 latency must be under 50ms, got {p95:.2f}ms"
 

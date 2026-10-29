@@ -13,11 +13,17 @@ from tabulate import tabulate
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Upload a file to SecureNodeX decentralized storage")
+    parser = argparse.ArgumentParser(
+        description="Upload a file to SecureNodeX decentralized storage"
+    )
     parser.add_argument("file", help="Path to file to upload")
-    parser.add_argument("--api-url", default=os.getenv("SNX_API_URL", "http://localhost:8443"), help="Base API URL")
+    parser.add_argument(
+        "--api-url", default=os.getenv("SNX_API_URL", "http://localhost:8443"), help="Base API URL"
+    )
     parser.add_argument("--token", default=os.getenv("SNX_TOKEN"), help="Bearer JWT token")
-    parser.add_argument("--classification", default="internal", choices=["public", "internal", "confidential"])
+    parser.add_argument(
+        "--classification", default="internal", choices=["public", "internal", "confidential"]
+    )
     args = parser.parse_args()
 
     if not os.path.exists(args.file):
@@ -59,7 +65,9 @@ def main() -> None:
     print(f"    Manifest ID:  {res_data.get('manifest_id')}")
     print(f"    Merkle Root:  {res_data.get('merkle_root')}")
     print(f"    Chunk Count:  {res_data.get('chunk_count')}")
-    print(f"    Replication:  R={res_data.get('replication', {}).get('r')}, W={res_data.get('replication', {}).get('w')}")
+    print(
+        f"    Replication:  R={res_data.get('replication', {}).get('r')}, W={res_data.get('replication', {}).get('w')}"
+    )
 
     placements = res_data.get("placements", [])
     if placements:
@@ -70,7 +78,13 @@ def main() -> None:
             cid = p.get("chunk_id", "")
             table_rows.append([idx, f"{cid[:12]}...{cid[-8:]}", nodes_str])
 
-        print(tabulate(table_rows, headers=["Chunk #", "Ciphertext Chunk ID", "Replica Nodes"], tablefmt="grid"))
+        print(
+            tabulate(
+                table_rows,
+                headers=["Chunk #", "Ciphertext Chunk ID", "Replica Nodes"],
+                tablefmt="grid",
+            )
+        )
 
 
 if __name__ == "__main__":

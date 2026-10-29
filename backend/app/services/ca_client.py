@@ -38,7 +38,9 @@ class CAClient:
                 if res.status_code == 200:
                     return res.json()
         except Exception as e:
-            logger.warning(f"CA service call failed ({e}); falling back to local CA keys if present.")
+            logger.warning(
+                f"CA service call failed ({e}); falling back to local CA keys if present."
+            )
 
         # Fallback to in-process PKI if local intermediate CA exists
         return self._issue_in_process(csr_pem, principal_id, "device")

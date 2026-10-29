@@ -150,7 +150,9 @@ async def storage_cluster_health(
         "nodes_up": nodes_up,
         "under_replicated": under_replicated,
         "corrupt": corrupt_count,
-        "status": "healthy" if under_replicated == 0 and nodes_up >= settings.WRITE_QUORUM_W else "degraded",
+        "status": "healthy"
+        if under_replicated == 0 and nodes_up >= settings.WRITE_QUORUM_W
+        else "degraded",
     }
 
 

@@ -99,7 +99,9 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
     cid = getattr(request.state, "correlation_id", "unknown")
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -129,4 +131,5 @@ app.include_router(stream.router)
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8443, reload=True)

@@ -121,10 +121,7 @@ class SimulatorRunner:
     async def run(self) -> dict[str, Any]:
         """Execute simulation run across all virtual devices concurrently."""
         end_time = time.time() + self.duration_s
-        tasks = [
-            asyncio.create_task(self._run_device_loop(dev, end_time))
-            for dev in self.devices
-        ]
+        tasks = [asyncio.create_task(self._run_device_loop(dev, end_time)) for dev in self.devices]
         await asyncio.gather(*tasks)
         self.metrics.finalize()
         return self.metrics.get_summary()

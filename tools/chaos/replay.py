@@ -6,9 +6,9 @@ Re-sends an old or duplicate sequence number; verifies gateway rejects with REPL
 import argparse
 import asyncio
 import json
-from pathlib import Path
 import sys
 import time
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
@@ -20,7 +20,9 @@ from backend.app.message_core import sign_device_message
 
 
 async def main() -> None:
-    parser = argparse.ArgumentParser(description="Inject replayed message sequence into SecureNodeX Gateway")
+    parser = argparse.ArgumentParser(
+        description="Inject replayed message sequence into SecureNodeX Gateway"
+    )
     parser.add_argument("--device-id", default="device-chaos-replay", help="Target device ID")
     args = parser.parse_args()
 
@@ -49,7 +51,7 @@ async def main() -> None:
     assert ok1 is True
 
     # Step 2: Replay duplicate seq=10
-    print(f"[CHAOS] Attempting replay with duplicate seq=10...")
+    print("[CHAOS] Attempting replay with duplicate seq=10...")
     env_replay = sign_device_message(
         private_key=priv_key,
         device_id=args.device_id,

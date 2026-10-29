@@ -38,7 +38,10 @@ async def get_live_storage_nodes(db: AsyncSession) -> list[StorageNodeInfo]:
     if not db_nodes:
         # Fallback to 5 standard development storage node endpoints
         return [
-            StorageNodeInfo(id=f"storage-{i}", endpoint=f"http://storage{i}:7443" if i > 3 else f"http://storage-{i}:7443")
+            StorageNodeInfo(
+                id=f"storage-{i}",
+                endpoint=f"http://storage{i}:7443" if i > 3 else f"http://storage-{i}:7443",
+            )
             for i in range(1, 6)
         ]
 
@@ -204,7 +207,9 @@ async def get_object_metadata(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Object not found")
 
     is_owner = obj.owner_id == current_user.id
-    if not is_owner and not (current_user.is_admin() or current_user.is_manager() or current_user.is_auditor()):
+    if not is_owner and not (
+        current_user.is_admin() or current_user.is_manager() or current_user.is_auditor()
+    ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
 
     # Check replica counts
@@ -213,7 +218,9 @@ async def get_object_metadata(
 
     under_replicated = 0
     for c in chunks:
-        r_stmt = select(ChunkReplica).where(ChunkReplica.chunk_id == c.id, ChunkReplica.state == "stored")
+        r_stmt = select(ChunkReplica).where(
+            ChunkReplica.chunk_id == c.id, ChunkReplica.state == "stored"
+        )
         reps = (await db.execute(r_stmt)).scalars().all()
         if len(reps) < coordinator.r:
             under_replicated += 1
@@ -246,19 +253,25 @@ async def get_object_placement(
     if not obj:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Object not found")
 
-    c_stmt = select(StoredChunk).where(StoredChunk.object_id == object_id).order_by(StoredChunk.idx.asc())
+    c_stmt = (
+        select(StoredChunk)
+        .where(StoredChunk.object_id == object_id)
+        .order_by(StoredChunk.idx.asc())
+    )
     chunks = (await db.execute(c_stmt)).scalars().all()
 
     placements = []
     for c in chunks:
         r_stmt = select(ChunkReplica).where(ChunkReplica.chunk_id == c.id)
         reps = (await db.execute(r_stmt)).scalars().all()
-        placements.append({
-            "chunk_index": c.idx,
-            "chunk_id": c.id,
-            "length": c.length,
-            "nodes": [r.node_id for r in reps],
-        })
+        placements.append(
+            {
+                "chunk_index": c.idx,
+                "chunk_id": c.id,
+                "length": c.length,
+                "nodes": [r.node_id for r in reps],
+            }
+        )
 
     return {
         "object_id": object_id,
@@ -286,13 +299,21 @@ async def download_object(
     is_owner = obj.owner_id == current_user.id
     if not is_owner and not current_user.is_admin():
         # Check grant
-        g_stmt = select(ObjectGrant).where(ObjectGrant.object_id == object_id, ObjectGrant.grantee_id == current_user.id)
+        g_stmt = select(ObjectGrant).where(
+            ObjectGrant.object_id == object_id, ObjectGrant.grantee_id == current_user.id
+        )
         grant = (await db.execute(g_stmt)).scalar_one_or_none()
         if not grant:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access not granted to object")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Access not granted to object"
+            )
 
     # Fetch chunks
-    c_stmt = select(StoredChunk).where(StoredChunk.object_id == object_id).order_by(StoredChunk.idx.asc())
+    c_stmt = (
+        select(StoredChunk)
+        .where(StoredChunk.object_id == object_id)
+        .order_by(StoredChunk.idx.asc())
+    )
     chunks = (await db.execute(c_stmt)).scalars().all()
 
     manifest = {
@@ -433,11 +454,19 @@ async def verify_object(
     if not obj:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Object not found")
 
-    c_stmt = select(StoredChunk).where(StoredChunk.object_id == object_id).order_by(StoredChunk.idx.asc())
+    c_stmt = (
+        select(StoredChunk)
+        .where(StoredChunk.object_id == object_id)
+        .order_by(StoredChunk.idx.asc())
+    )
     chunks = (await db.execute(c_stmt)).scalars().all()
     chunk_ids = [c.id for c in chunks]
 
-    calculated_merkle = coordinator.compute_merkle_root(chunk_ids) if hasattr(coordinator, "compute_merkle_root") else obj.merkle_root
+    calculated_merkle = (
+        coordinator.compute_merkle_root(chunk_ids)
+        if hasattr(coordinator, "compute_merkle_root")
+        else obj.merkle_root
+    )
 
     return {
         "object_id": object_id,

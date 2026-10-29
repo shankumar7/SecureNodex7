@@ -79,8 +79,12 @@ class ChainClient:
     def _find_deployments_file(self) -> str:
         candidates = [
             settings.DEPLOYMENTS_FILE,
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../deployments/hardhat.json")),
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../deployments/besu.json")),
+            os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "../../../deployments/hardhat.json")
+            ),
+            os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "../../../deployments/besu.json")
+            ),
             "/app/deployments/hardhat.json",
             "/app/deployments/besu.json",
         ]
@@ -91,7 +95,9 @@ class ChainClient:
 
     def _load_contracts(self) -> None:
         if not os.path.exists(self.deployments_path):
-            logger.warning(f"Deployment file not found at {self.deployments_path}. Contracts will not be loaded.")
+            logger.warning(
+                f"Deployment file not found at {self.deployments_path}. Contracts will not be loaded."
+            )
             return
 
         with open(self.deployments_path) as f:
@@ -120,14 +126,18 @@ class ChainClient:
 
     def _get_nonce(self) -> int:
         with self._nonce_lock:
-            latest_nonce = self.w3.eth.get_transaction_count(self.operator_account.address, "pending")
+            latest_nonce = self.w3.eth.get_transaction_count(
+                self.operator_account.address, "pending"
+            )
             if self._current_nonce is None or self._current_nonce < latest_nonce:
                 self._current_nonce = latest_nonce
             else:
                 self._current_nonce += 1
             return self._current_nonce
 
-    def _send_transaction(self, contract_function: Any, gas_limit: int = 500000, max_retries: int = 3) -> dict[str, Any]:
+    def _send_transaction(
+        self, contract_function: Any, gas_limit: int = 500000, max_retries: int = 3
+    ) -> dict[str, Any]:
         """Sign, send, and await transaction receipt with retry logic."""
         last_error = None
         for attempt in range(max_retries):
@@ -135,13 +145,15 @@ class ChainClient:
                 nonce = self._get_nonce()
                 gas_price = self.w3.eth.gas_price
 
-                tx = contract_function.build_transaction({
-                    "from": self.operator_account.address,
-                    "nonce": nonce,
-                    "gas": gas_limit,
-                    "gasPrice": gas_price,
-                    "chainId": self.chain_id,
-                })
+                tx = contract_function.build_transaction(
+                    {
+                        "from": self.operator_account.address,
+                        "nonce": nonce,
+                        "gas": gas_limit,
+                        "gasPrice": gas_price,
+                        "chainId": self.chain_id,
+                    }
+                )
 
                 signed_tx = self.w3.eth.account.sign_transaction(tx, self.operator_account.key)
                 tx_hash = self.w3.eth.send_raw_transaction(signed_tx.raw_transaction)
@@ -166,7 +178,9 @@ class ChainClient:
         raise RuntimeError(f"Transaction failed after {max_retries} attempts: {last_error}")
 
     # --- IdentityRegistry ---
-    def register_identity(self, identity_id: str, fingerprint: str, role_mask: int, metadata_uri: str = "") -> dict[str, Any]:
+    def register_identity(
+        self, identity_id: str, fingerprint: str, role_mask: int, metadata_uri: str = ""
+    ) -> dict[str, Any]:
         contract = self.contracts.get("IdentityRegistry")
         if not contract:
             raise RuntimeError("IdentityRegistry contract not loaded")
@@ -198,7 +212,9 @@ class ChainClient:
         contract = self.contracts.get("IdentityRegistry")
         if not contract:
             raise RuntimeError("IdentityRegistry contract not loaded")
-        return self._send_transaction(contract.functions.rotate(to_bytes32(identity_id), to_bytes32(new_fingerprint)))
+        return self._send_transaction(
+            contract.functions.rotate(to_bytes32(identity_id), to_bytes32(new_fingerprint))
+        )
 
     def get_identity(self, identity_id: str) -> dict[str, Any]:
         contract = self.contracts.get("IdentityRegistry")

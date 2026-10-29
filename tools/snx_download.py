@@ -13,10 +13,14 @@ import httpx
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Download and verify a file from SecureNodeX storage")
+    parser = argparse.ArgumentParser(
+        description="Download and verify a file from SecureNodeX storage"
+    )
     parser.add_argument("object_id", help="UUID of object to download")
     parser.add_argument("output", help="Path to save downloaded file")
-    parser.add_argument("--api-url", default=os.getenv("SNX_API_URL", "http://localhost:8443"), help="Base API URL")
+    parser.add_argument(
+        "--api-url", default=os.getenv("SNX_API_URL", "http://localhost:8443"), help="Base API URL"
+    )
     parser.add_argument("--token", default=os.getenv("SNX_TOKEN"), help="Bearer JWT token")
     args = parser.parse_args()
 

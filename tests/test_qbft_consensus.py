@@ -20,7 +20,9 @@ def test_genesis_qbft_configuration():
     # Verify Chain ID
     config = genesis.get("config", {})
     assert config.get("chainId") == 20260, "Chain ID must be 20260 per spec"
-    assert config.get("zeroBaseFee") is True, "zeroBaseFee must be true for zero-gas enterprise network"
+    assert config.get("zeroBaseFee") is True, (
+        "zeroBaseFee must be true for zero-gas enterprise network"
+    )
 
     # Verify QBFT settings
     qbft = config.get("qbft", {})
@@ -45,11 +47,15 @@ def test_validator_key_and_address_consistency():
     # Operator account allocated in genesis
     operator_addr = "fe3b557e8fb62b89f4916b721be55ceb828dbd73"
     alloc_normalized = {k.lower().removeprefix("0x"): v for k, v in alloc.items()}
-    assert operator_addr in alloc_normalized, f"Operator {operator_addr} must have balance in genesis alloc"
+    assert operator_addr in alloc_normalized, (
+        f"Operator {operator_addr} must have balance in genesis alloc"
+    )
 
     nodes_dir = Path("chain/nodes")
     if nodes_dir.exists():
-        validators = [d for d in nodes_dir.iterdir() if d.is_dir() and d.name.startswith("validator")]
+        validators = [
+            d for d in nodes_dir.iterdir() if d.is_dir() and d.name.startswith("validator")
+        ]
         assert len(validators) == 4, "Must have exactly 4 validator node directories generated"
 
         for v in validators:
@@ -61,7 +67,9 @@ def test_validator_key_and_address_consistency():
             assert pubkey_file.exists(), f"Validator {v.name} missing node.pub file"
 
             address_hex = address_file.read_text().strip()
-            assert len(address_hex) == 40, f"Validator {v.name} address should be 40 hex chars (20 bytes)"
+            assert len(address_hex) == 40, (
+                f"Validator {v.name} address should be 40 hex chars (20 bytes)"
+            )
 
 
 class QBFTConsensusSimulator:

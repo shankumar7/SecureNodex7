@@ -239,7 +239,9 @@ class DeviceService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Device not found")
 
         if device.status != "ACTIVE":
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Device is not active")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Device is not active"
+            )
 
         ca_res = await ca_client.issue_device_cert(csr_pem=csr_pem, principal_id=device_id)
         cert_pem = ca_res["certificate_pem"]

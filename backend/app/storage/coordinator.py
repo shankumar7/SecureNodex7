@@ -112,12 +112,14 @@ class StorageCoordinator:
             )
             cid = hashlib.sha256(ciphertext).hexdigest().lower()
             encrypted_chunks.append(ciphertext)
-            chunks_meta.append({
-                "i": idx,
-                "id": cid,
-                "len": len(ciphertext),
-                "nonce": nonce_b64,
-            })
+            chunks_meta.append(
+                {
+                    "i": idx,
+                    "id": cid,
+                    "len": len(ciphertext),
+                    "nonce": nonce_b64,
+                }
+            )
 
         # 2. Compute HRW placements and apply Diversity Rule (FR-STO-3)
         chunk_ids = [c["id"] for c in chunks_meta]
@@ -150,7 +152,9 @@ class StorageCoordinator:
                     for fallback_node in remaining_nodes:
                         if len(successful_nodes) >= self.w:
                             break
-                        if await self._send_chunk_to_node(client, fallback_node, cid, ciphertext, kind="data"):
+                        if await self._send_chunk_to_node(
+                            client, fallback_node, cid, ciphertext, kind="data"
+                        ):
                             successful_nodes.append(fallback_node)
 
                 # Check if Quorum W was satisfied
@@ -184,13 +188,17 @@ class StorageCoordinator:
                 "classification": classification,
             }
 
-            canonical_manifest = json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            canonical_manifest = json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode(
+                "utf-8"
+            )
             manifest_id = hashlib.sha256(canonical_manifest).hexdigest().lower()
 
             # Store manifest blob on live nodes
             manifest_placements = place_chunk(manifest_id, live_nodes, self.r)
             for mn in manifest_placements:
-                await self._send_chunk_to_node(client, mn, manifest_id, canonical_manifest, kind="manifest")
+                await self._send_chunk_to_node(
+                    client, mn, manifest_id, canonical_manifest, kind="manifest"
+                )
 
             # 5. Store Grant Blob (ECIES key wrap) if owner public key provided
             grant_blob_id = None
@@ -200,7 +208,9 @@ class StorageCoordinator:
                 grant_blob_id = hashlib.sha256(grant_json).hexdigest().lower()
                 grant_nodes = place_chunk(grant_blob_id, live_nodes, self.r)
                 for gn in grant_nodes:
-                    await self._send_chunk_to_node(client, gn, grant_blob_id, grant_json, kind="grant")
+                    await self._send_chunk_to_node(
+                        client, gn, grant_blob_id, grant_json, kind="grant"
+                    )
 
         return {
             "object_id": object_id,

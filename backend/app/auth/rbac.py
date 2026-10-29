@@ -69,8 +69,14 @@ def mask_to_role_names(mask: int) -> list[str]:
 # Full (Y): always allowed. Scoped (O): allowed only if resource ownership/grant matches.
 PERMISSION_MATRIX: dict[str, tuple[int, int]] = {
     "principal:create": (RoleBit.ADMIN.value, 0),
-    "principal:set-roles": (RoleBit.ADMIN.value, RoleBit.MANAGER.value),  # Manager allowed conditionally
-    "principal:read": (RoleBit.ADMIN.value | RoleBit.MANAGER.value | RoleBit.AUDITOR.value, RoleBit.USER.value),
+    "principal:set-roles": (
+        RoleBit.ADMIN.value,
+        RoleBit.MANAGER.value,
+    ),  # Manager allowed conditionally
+    "principal:read": (
+        RoleBit.ADMIN.value | RoleBit.MANAGER.value | RoleBit.AUDITOR.value,
+        RoleBit.USER.value,
+    ),
     "principal:status": (RoleBit.ADMIN.value, 0),
     "device:enroll": (RoleBit.ADMIN.value | RoleBit.MANAGER.value, 0),
     "device:revoke": (RoleBit.ADMIN.value | RoleBit.MANAGER.value, 0),
@@ -89,7 +95,10 @@ PERMISSION_MATRIX: dict[str, tuple[int, int]] = {
     "object:delete": (RoleBit.ADMIN.value, RoleBit.MANAGER.value | RoleBit.USER.value),
     "asset:mint": (RoleBit.ADMIN.value | RoleBit.MANAGER.value, 0),
     "asset:transfer": (RoleBit.ADMIN.value | RoleBit.MANAGER.value, RoleBit.USER.value),
-    "asset:read": (RoleBit.ADMIN.value | RoleBit.MANAGER.value | RoleBit.AUDITOR.value, RoleBit.USER.value),
+    "asset:read": (
+        RoleBit.ADMIN.value | RoleBit.MANAGER.value | RoleBit.AUDITOR.value,
+        RoleBit.USER.value,
+    ),
     "audit:read": (
         RoleBit.ADMIN.value | RoleBit.MANAGER.value | RoleBit.AUDITOR.value,
         RoleBit.USER.value,
@@ -162,7 +171,9 @@ async def get_current_principal(
 
     principal_id = payload.get("sub")
     if not principal_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token subject")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token subject"
+        )
 
     # Check database principal status
     query = select(Principal).where(Principal.id == principal_id)
@@ -191,7 +202,9 @@ async def get_current_principal(
 def require(permission: str, allow_own: bool = False) -> Callable[..., Any]:
     """FastAPI dependency for enforcing RBAC permissions with deny-by-default."""
 
-    async def dependency(principal: CurrentPrincipal = Depends(get_current_principal)) -> CurrentPrincipal:
+    async def dependency(
+        principal: CurrentPrincipal = Depends(get_current_principal),
+    ) -> CurrentPrincipal:
         if not is_permission_allowed(permission, principal.role_mask, is_own_resource=allow_own):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

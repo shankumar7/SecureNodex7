@@ -35,8 +35,16 @@ class SimulationMetrics:
     def get_summary(self) -> dict[str, Any]:
         duration = (self.end_time or time.time()) - self.start_time
         throughput = round(self.total_attempted / duration, 2) if duration > 0 else 0.0
-        accepted_rate = round((self.total_accepted / self.total_attempted) * 100, 2) if self.total_attempted > 0 else 0.0
-        loss_rate = round((self.total_rejected / self.total_attempted) * 100, 2) if self.total_attempted > 0 else 0.0
+        accepted_rate = (
+            round((self.total_accepted / self.total_attempted) * 100, 2)
+            if self.total_attempted > 0
+            else 0.0
+        )
+        loss_rate = (
+            round((self.total_rejected / self.total_attempted) * 100, 2)
+            if self.total_attempted > 0
+            else 0.0
+        )
 
         latencies = sorted(self.latencies_ms)
         p50 = round(statistics.median(latencies), 2) if latencies else 0.0
