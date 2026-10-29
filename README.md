@@ -211,10 +211,10 @@ This project was engineered with passion by **Team CodeCommit**:
 | Avatar | Name | Role | GitHub Profile |
 | :---: | :--- | :--- | :---: |
 | <img src="https://github.com/shankumar7.png" width="60" style="border-radius:50%"/> | **Shashank Kumar** | Team Lead & Core System Architecture | [@shankumar7](https://github.com/shankumar7) |
+| <img src="https://github.com/rithwikd-07.png" width="60" style="border-radius:50%"/> | **D Rithwik** | Frontend Engineering & Dashboard UI | [@rithwikd-07](https://github.com/rithwikd-07) |
+| <img src="https://github.com/ezazali-14.png" width="60" style="border-radius:50%"/> | **Ezaz Ali** | Backend APIs & PKI Infrastructure | [@ezazali-14](https://github.com/ezazali-14) |
 | <img src="https://github.com/DheerajPusuluri.png" width="60" style="border-radius:50%"/> | **Dheeraj Pusuluri** | Smart Contracts & Blockchain Consensus | [@DheerajPusuluri](https://github.com/DheerajPusuluri) |
 | <img src="https://github.com/Dinesh2006kumar.png" width="60" style="border-radius:50%"/> | **Dinesh Kumar** | Edge Node Firmware & Storage Daemon | [@Dinesh2006kumar](https://github.com/Dinesh2006kumar) |
-| <img src="https://github.com/ezazali-14.png" width="60" style="border-radius:50%"/> | **Ezaz Ali** | Backend APIs & PKI Infrastructure | [@ezazali-14](https://github.com/ezazali-14) |
-| <img src="https://github.com/rithwikd-07.png" width="60" style="border-radius:50%"/> | **D Rithwik** | Frontend Engineering & Dashboard UI | [@rithwikd-07](https://github.com/rithwikd-07) |
 | <img src="https://github.com/shruthi-peddapuram.png" width="60" style="border-radius:50%"/> | **Shruthi Peddapuram** | QA, Chaos Testing & Cryptographic Verification | [@shruthi-peddapuram](https://github.com/shruthi-peddapuram) |
 
 </div>
