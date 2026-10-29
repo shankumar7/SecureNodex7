@@ -168,6 +168,46 @@ services:
       timeout: 5s
       retries: 5
 
+  storage-4:
+    build:
+      context: ..
+      dockerfile: storage/Dockerfile
+    container_name: snx-storage-4
+    restart: unless-stopped
+    command: ["uvicorn", "storage.app.main:app", "--host", "0.0.0.0", "--port", "7446"]
+    environment:
+      NODE_ID: storage-4
+      PORT: 7446
+    ports:
+      - "7446:7446"
+    volumes:
+      - snx_storage4_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:7446/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  storage-5:
+    build:
+      context: ..
+      dockerfile: storage/Dockerfile
+    container_name: snx-storage-5
+    restart: unless-stopped
+    command: ["uvicorn", "storage.app.main:app", "--host", "0.0.0.0", "--port", "7447"]
+    environment:
+      NODE_ID: storage-5
+      PORT: 7447
+    ports:
+      - "7447:7447"
+    volumes:
+      - snx_storage5_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:7447/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   dashboard:
     build:
       context: ..
@@ -187,3 +227,5 @@ volumes:
   snx_storage1_data:
   snx_storage2_data:
   snx_storage3_data:
+  snx_storage4_data:
+  snx_storage5_data:

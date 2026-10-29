@@ -175,3 +175,17 @@ class ObjectGrant(Base):
     grant_blob_id = Column(String(64), nullable=False)
     permissions = Column(Integer, nullable=False, default=1)  # 1=READ, 2=WRITE
     created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+class BatchRecord(Base):
+    __tablename__ = "batches"
+
+    id = Column(String(64), primary_key=True)  # keccak256 or UUID
+    batch_root = Column(String(66), nullable=False, index=True)
+    manifest_id = Column(String(64), nullable=False, index=True)
+    message_count = Column(Integer, nullable=False)
+    from_ts = Column(BigInteger, nullable=False)
+    to_ts = Column(BigInteger, nullable=False)
+    tx_hash = Column(String(66), nullable=True)
+    messages_json = Column(Text, nullable=False)  # Serialized envelopes for proof serving
+    created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)

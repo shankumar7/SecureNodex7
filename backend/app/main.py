@@ -106,7 +106,17 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 
-from backend.app.routers import audit, auth, devices, health, objects, principals, storage_admin
+from backend.app.routers import (
+    audit,
+    auth,
+    batches,
+    devices,
+    health,
+    objects,
+    principals,
+    storage_admin,
+    stream,
+)
 
 # Include Routers
 app.include_router(health.router)
@@ -116,6 +126,8 @@ app.include_router(devices.router)
 app.include_router(audit.router)
 app.include_router(objects.router)
 app.include_router(storage_admin.router)
+app.include_router(batches.router)
+app.include_router(stream.router)
 
 
 if __name__ == "__main__":

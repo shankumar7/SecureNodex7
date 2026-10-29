@@ -16,18 +16,27 @@ import httpx
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Query, Request, Response, status
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
-from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, generate_latest
-
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, REGISTRY, generate_latest
 from storage.app.config import storage_settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("snx-storage")
 
-STORAGE_CHUNKS_TOTAL = Gauge(
+def get_or_create_gauge(name: str, desc: str, labels: list[str]) -> Gauge:
+    if name in REGISTRY._names_to_collectors:
+        return REGISTRY._names_to_collectors[name]  # type: ignore
+    return Gauge(name, desc, labels)
+
+def get_or_create_counter(name: str, desc: str, labels: list[str]) -> Counter:
+    if name in REGISTRY._names_to_collectors:
+        return REGISTRY._names_to_collectors[name]  # type: ignore
+    return Counter(name, desc, labels)
+
+STORAGE_CHUNKS_TOTAL = get_or_create_gauge(
     "snx_storage_chunks_total", "Total chunks stored on this node", ["node_id"]
 )
-STORAGE_BYTES = Gauge("snx_storage_bytes", "Total storage bytes used on this node", ["node_id"])
-STORAGE_OPERATIONS = Counter(
+STORAGE_BYTES = get_or_create_gauge("snx_storage_bytes", "Total storage bytes used on this node", ["node_id"])
+STORAGE_OPERATIONS = get_or_create_counter(
     "snx_storage_operations_total", "Storage chunk operations count", ["node_id", "op", "status"]
 )
 
