@@ -25,7 +25,7 @@ import {
 import { api } from "../lib/api";
 
 function DashboardContent() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
 
   // App Data State
@@ -67,9 +67,9 @@ function DashboardContent() {
 
   useEffect(() => {
     refreshData();
-    const interval = setInterval(refreshData, 10000);
+    const interval = setInterval(refreshData, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [token, activeTab]);
 
   // WebSocket / Telemetry Live Stream
   useEffect(() => {
@@ -151,12 +151,12 @@ function DashboardContent() {
   }, []);
 
   const stats = {
-    deviceCount: devices.length || 3,
-    activeDeviceCount: devices.filter((d) => d.status === "ACTIVE").length || 3,
-    objectCount: objects.length || 4,
-    liveNodes: nodes.filter((n) => n.state === "UP").length || 5,
-    totalNodes: nodes.length || 5,
-    auditEventsCount: auditEvents.length || 12,
+    deviceCount: devices.length,
+    activeDeviceCount: devices.filter((d) => d.status === "ACTIVE").length,
+    objectCount: objects.length,
+    liveNodes: nodes.filter((n) => n.state === "UP").length,
+    totalNodes: nodes.length,
+    auditEventsCount: auditEvents.length,
   };
 
   return (

@@ -1,9 +1,9 @@
-"""Storage administration and cluster health endpoints."""
-
+import asyncio
 from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
+import httpx
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +15,41 @@ from backend.app.db.models import ChunkReplica, StorageNode, StoredChunk
 from backend.app.db.session import get_db
 
 router = APIRouter(prefix="/v1", tags=["Storage Administration"])
+
+
+async def probe_nodes(nodes: list[StorageNode], db: AsyncSession) -> None:
+    """Actively probe all storage nodes via their HTTP health endpoint to detect failures in real-time."""
+    now = datetime.now(timezone.utc)
+    changed = False
+
+    async with httpx.AsyncClient(timeout=1.0, verify=False) as client:
+        async def _check(node: StorageNode) -> None:
+            nonlocal changed
+            url = f"{node.endpoint.rstrip('/')}/v1/health"
+            try:
+                res = await client.get(url)
+                if res.status_code == 200:
+                    data = res.json()
+                    if node.state != "UP":
+                        node.state = "UP"
+                        changed = True
+                    node.free_bytes = data.get("free_bytes", node.free_bytes)
+                    node.used_bytes = data.get("used_bytes", node.used_bytes)
+                    node.chunk_count = data.get("chunks", node.chunk_count)
+                    node.last_heartbeat = now
+                else:
+                    if node.state != "DOWN":
+                        node.state = "DOWN"
+                        changed = True
+            except Exception:
+                if node.state != "DOWN":
+                    node.state = "DOWN"
+                    changed = True
+
+        await asyncio.gather(*[_check(n) for n in nodes])
+
+    if changed:
+        await db.commit()
 
 
 class RegisterNodeRequest(BaseModel):
@@ -29,9 +64,10 @@ async def list_storage_nodes(
     current_user: CurrentPrincipal = Depends(require("storage:health_read")),
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, Any]:
-    """List storage nodes with capacity and chunk counts."""
+    """List storage nodes with capacity and chunk counts (actively probed)."""
     stmt = select(StorageNode)
-    nodes = (await db.execute(stmt)).scalars().all()
+    nodes = list((await db.execute(stmt)).scalars().all())
+    await probe_nodes(nodes, db)
 
     return {
         "nodes": [
@@ -61,7 +97,16 @@ async def register_storage_node(
     stmt = select(StorageNode).where(StorageNode.id == req.id)
     existing = (await db.execute(stmt)).scalar_one_or_none()
     if existing:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Node already registered")
+        existing.endpoint = req.endpoint
+        existing.free_bytes = req.capacity
+        existing.state = "UP"
+        await db.commit()
+        return {
+            "status": "updated",
+            "node_id": req.id,
+            "endpoint": req.endpoint,
+            "capacity": req.capacity,
+        }
 
     node = StorageNode(
         id=req.id,
@@ -125,6 +170,7 @@ async def storage_cluster_health(
     """Cluster storage health metrics per docs/03 section 12."""
     stmt = select(StorageNode)
     nodes = list((await db.execute(stmt)).scalars().all())
+    await probe_nodes(nodes, db)
 
     nodes_up = sum(1 for n in nodes if n.state == "UP")
 

@@ -32,6 +32,10 @@ class ApiClient {
   getToken(): string | null {
     if (!this.token && typeof window !== "undefined") {
       this.token = localStorage.getItem("snx_token");
+      if (this.token && this.token.startsWith("demo-token-")) {
+        this.token = null;
+        localStorage.removeItem("snx_token");
+      }
     }
     return this.token;
   }
@@ -228,6 +232,16 @@ class ApiClient {
     return this.request<{ status: string; scanned_chunks: number; repaired: number }>(
       "/v1/storage/repair",
       { method: "POST" }
+    );
+  }
+
+  async registerStorageNode(id: string, endpoint: string, capacity: number = 10 * 1024 * 1024 * 1024) {
+    return this.request<{ status: string; node_id: string; endpoint: string; capacity: number }>(
+      "/v1/storage/nodes",
+      {
+        method: "POST",
+        body: JSON.stringify({ id, endpoint, capacity }),
+      }
     );
   }
 

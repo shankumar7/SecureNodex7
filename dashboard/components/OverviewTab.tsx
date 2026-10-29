@@ -15,11 +15,24 @@ interface OverviewTabProps {
 }
 
 export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
+  const isDataPlaneHealthy = stats.liveNodes >= 2;
+  const isAllNodesUp = stats.liveNodes === stats.totalNodes && stats.totalNodes > 0;
+  const isClusterHealthy = isDataPlaneHealthy && isAllNodesUp;
+
   const planes = [
     { name: "Device Plane", status: "ONLINE", desc: `${stats.activeDeviceCount}/${stats.deviceCount} ESP32 / Virtual Nodes (mTLS P-256)`, badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
     { name: "Gateway Plane", status: "ONLINE", desc: "snx-broker & snx-gateway (100 msg/30s batching)", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
     { name: "Control Plane", status: "ONLINE", desc: "snx-api, snx-worker, snx-ca, PostgreSQL", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
-    { name: "Data Plane", status: "ONLINE", desc: `SNX-Store (${stats.liveNodes}/${stats.totalNodes} nodes, R=3, W=2 Quorum)`, badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
+    {
+      name: "Data Plane",
+      status: !isDataPlaneHealthy ? "CRITICAL" : isAllNodesUp ? "ONLINE" : "DEGRADED",
+      desc: `SNX-Store (${stats.liveNodes}/${stats.totalNodes} nodes, W=2 Quorum ${isDataPlaneHealthy ? "met" : "failed"})`,
+      badge: !isDataPlaneHealthy
+        ? "bg-red-500/10 text-red-400 border-red-500/20"
+        : isAllNodesUp
+        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+        : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+    },
     { name: "Trust Plane", status: "ONLINE", desc: "Besu / Hardhat (ID: 20260) & Rolling Hash Chain", badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
   ];
 
@@ -73,7 +86,17 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
           <p className="text-2xl font-bold text-white">
             {stats.liveNodes} / {stats.totalNodes}
           </p>
-          <span className="text-[11px] text-emerald-400">Quorum W=2 satisfied</span>
+          <span
+            className={`text-[11px] font-medium flex items-center space-x-1 ${
+              stats.liveNodes >= 2 ? "text-emerald-400" : "text-red-400"
+            }`}
+          >
+            {stats.liveNodes >= 2 ? (
+              <span>Quorum W=2 satisfied</span>
+            ) : (
+              <span>QUORUM VIOLATED (W=2 degraded)</span>
+            )}
+          </span>
         </div>
 
         <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800 space-y-1">
@@ -90,7 +113,21 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       <div className="p-5 rounded-xl bg-gray-900/40 border border-gray-800 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white">5-Plane Architecture Status</h3>
-          <span className="text-xs text-emerald-400 font-mono">100% OPERATIONAL</span>
+          <span
+            className={`text-xs font-mono font-medium ${
+              isClusterHealthy
+                ? "text-emerald-400"
+                : !isDataPlaneHealthy
+                ? "text-red-400 animate-pulse"
+                : "text-yellow-400"
+            }`}
+          >
+            {isClusterHealthy
+              ? "100% OPERATIONAL"
+              : !isDataPlaneHealthy
+              ? "QUORUM FAILED"
+              : "DEGRADED (FAILOVER ACTIVE)"}
+          </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           {planes.map((p) => (

@@ -55,20 +55,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const savedToken = api.getToken();
-    if (savedToken) {
+    if (savedToken && !savedToken.startsWith("demo-token-")) {
       setToken(savedToken);
       api
         .getMe()
         .then((userData) => setUser(userData))
         .catch(() => {
-          // Token expired / invalid, clear
           api.setToken(null);
           setToken(null);
+          setUser(null);
         })
         .finally(() => setIsLoading(false));
     } else {
-      // Default to demo admin in development if no token
-      demoLogin("ADMIN").finally(() => setIsLoading(false));
+      api.setToken(null);
+      setToken(null);
+      setUser(null);
+      setIsLoading(false);
     }
   }, []);
 
@@ -76,8 +78,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       const res = await api.login(username, password);
-      setUser(res.principal);
       setToken(res.access_token);
+      api.setToken(res.access_token);
+      const me = await api.getMe();
+      setUser(me);
     } finally {
       setIsLoading(false);
     }
@@ -85,19 +89,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const demoLogin = async (roleName: string) => {
     const roleUpper = roleName.toUpperCase();
-    const mask = ROLE_MASKS[roleUpper as keyof typeof ROLE_MASKS] || 8;
-    const mockPrincipal: Principal = {
-      id: `did:snx:${roleUpper.toLowerCase()}1`,
-      username: `${roleUpper.toLowerCase()}`,
-      display_name: `${roleUpper} Operator`,
-      roles: [roleUpper],
-      role_mask: mask,
-      status: "ACTIVE",
-      created_at: new Date().toISOString(),
-    };
-    setUser(mockPrincipal);
-    setToken(`demo-token-${roleUpper.toLowerCase()}`);
-    api.setToken(`demo-token-${roleUpper.toLowerCase()}`);
+    let uname = "admin";
+    let pword = "Admin123!";
+    if (roleUpper === "MANAGER") {
+      uname = "manager";
+      pword = "Manager123!";
+    } else if (roleUpper === "AUDITOR") {
+      uname = "auditor";
+      pword = "Auditor123!";
+    } else if (roleUpper === "OPERATOR") {
+      uname = "operator";
+      pword = "Operator123!";
+    } else if (roleUpper === "USER") {
+      uname = "user1";
+      pword = "User123!";
+    }
+
+    await login(uname, pword);
   };
 
   const logout = () => {

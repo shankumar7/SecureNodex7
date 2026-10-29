@@ -21,11 +21,16 @@ export const AuditTab: React.FC<AuditTabProps> = ({ events, onRefresh }) => {
   const canVerify = hasPermission("audit:verify");
 
   const filteredEvents = events.filter((ev) => {
-    const matchType = eventTypeFilter === "ALL" || ev.event_type === eventTypeFilter;
+    const actorStr = ev.actor || ev.actor_id || "";
+    const subjectStr = ev.subject || ev.subject_id || "";
+    const eventTypeStr = ev.event_type || "";
+    const searchLower = (searchTerm || "").toLowerCase();
+
+    const matchType = eventTypeFilter === "ALL" || eventTypeStr === eventTypeFilter;
     const matchSearch =
-      ev.actor_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ev.subject_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ev.event_type.toLowerCase().includes(searchTerm.toLowerCase());
+      actorStr.toLowerCase().includes(searchLower) ||
+      subjectStr.toLowerCase().includes(searchLower) ||
+      eventTypeStr.toLowerCase().includes(searchLower);
     return matchType && matchSearch;
   });
 
@@ -181,9 +186,9 @@ export const AuditTab: React.FC<AuditTabProps> = ({ events, onRefresh }) => {
                     </td>
                     <td className="px-4 py-3 font-mono text-[11px]">
                       <div className="truncate max-w-xs">
-                        <span className="text-white">{ev.actor_id}</span>
+                        <span className="text-white">{ev.actor || ev.actor_id || "system"}</span>
                         <span className="text-gray-500"> → </span>
-                        <span className="text-blue-400">{ev.subject_id}</span>
+                        <span className="text-blue-400">{ev.subject || ev.subject_id || "cluster"}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3 font-mono text-[11px] text-yellow-400/90">

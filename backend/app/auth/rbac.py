@@ -5,9 +5,15 @@ from enum import IntFlag
 from typing import Any, Callable
 
 from fastapi import Depends, Header, HTTPException, status
-from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+try:
+    from jwt.exceptions import InvalidTokenError
+except ImportError:
+    try:
+        from jose.exceptions import JWTError as InvalidTokenError
+    except ImportError:
+        InvalidTokenError = Exception
 
 from backend.app.auth.security import decode_access_token
 from backend.app.db.models import Principal

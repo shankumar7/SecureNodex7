@@ -92,3 +92,24 @@ async def websocket_stream(
         await ws_manager.disconnect(websocket)
     except Exception:
         await ws_manager.disconnect(websocket)
+
+
+@router.post("/v1/telemetry/publish")
+async def publish_telemetry(data: dict[str, Any]) -> dict[str, Any]:
+    """Broadcast an ingested telemetry envelope directly to active dashboard subscribers."""
+    # Ensure decoded payload is available for display
+    if "p" in data and "p_decoded" not in data:
+        import base64
+
+        try:
+            p_val = data["p"]
+            if isinstance(p_val, str):
+                padded = p_val + "=" * ((4 - len(p_val) % 4) % 4)
+                data["p_decoded"] = json.loads(base64.urlsafe_b64decode(padded))
+            elif isinstance(p_val, dict):
+                data["p_decoded"] = p_val
+        except Exception:
+            pass
+    await ws_manager.broadcast("telemetry", data)
+    return {"status": "ok", "broadcast": True}
+

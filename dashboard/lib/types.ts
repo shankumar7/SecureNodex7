@@ -96,8 +96,10 @@ export interface AuditEvent {
   id: string;
   seq?: number;
   event_type: string;
-  actor_id: string;
-  subject_id: string;
+  actor_id?: string;
+  subject_id?: string;
+  actor?: string;
+  subject?: string;
   data_hash: string;
   correlation_id: string;
   timestamp: number;

@@ -38,9 +38,12 @@ export const DevicesTab: React.FC<DevicesTabProps> = ({ devices, onRefresh }) =>
   const canRotate = hasPermission("device:rotate");
 
   const filteredDevices = devices.filter((d) => {
+    const idStr = d.id || "";
+    const labelStr = d.label || "";
+    const searchLower = (searchTerm || "").toLowerCase();
     const matchSearch =
-      d.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.label.toLowerCase().includes(searchTerm.toLowerCase());
+      idStr.toLowerCase().includes(searchLower) ||
+      labelStr.toLowerCase().includes(searchLower);
     const matchStatus = statusFilter === "ALL" || d.status === statusFilter;
     return matchSearch && matchStatus;
   });

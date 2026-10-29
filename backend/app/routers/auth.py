@@ -153,6 +153,7 @@ async def logout(
 
 
 @router.get("/me", response_model=MeResponse)
+@router.get("/auth/me", response_model=MeResponse)
 async def get_me(
     principal: CurrentPrincipal = Depends(get_current_principal),
     db: AsyncSession = Depends(get_db),

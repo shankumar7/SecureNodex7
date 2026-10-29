@@ -98,6 +98,7 @@ async def upload_object(
         dek_hex=result["dek"],
     )
     db.add(db_obj)
+    await db.flush()
 
     # Record chunks and replicas
     for c in manifest["chunks"]:
@@ -110,6 +111,8 @@ async def upload_object(
             nonce=c["nonce"],
         )
         db.add(db_chunk)
+
+    await db.flush()
 
     for p in result["placements"]:
         cid = p["chunk_id"]
@@ -264,12 +267,15 @@ async def get_object_placement(
     for c in chunks:
         r_stmt = select(ChunkReplica).where(ChunkReplica.chunk_id == c.id)
         reps = (await db.execute(r_stmt)).scalars().all()
+        node_ids = [r.node_id for r in reps]
         placements.append(
             {
                 "chunk_index": c.idx,
                 "chunk_id": c.id,
                 "length": c.length,
-                "nodes": [r.node_id for r in reps],
+                "nodes": node_ids,
+                "primary_node": node_ids[0] if node_ids else None,
+                "replica_nodes": node_ids[1:] if len(node_ids) > 1 else [],
             }
         )
 

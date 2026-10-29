@@ -310,25 +310,36 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
                               Chunk #{chunk.chunk_index}
                             </td>
                             {nodes.map((n) => {
-                              const isPrimary = chunk.primary_node === n.id;
-                              const isReplica = chunk.replica_nodes?.includes(n.id);
+                              const nodeList = chunk.nodes || [];
+                              const primaryNode = chunk.primary_node || nodeList[0];
+                              const replicaNodes = chunk.replica_nodes || nodeList.slice(1);
+                              const isPrimary = primaryNode === n.id;
+                              const isReplica = replicaNodes?.includes(n.id) || (nodeList.includes(n.id) && !isPrimary);
                               const isNodeDown = n.state !== "UP";
 
                               return (
                                 <td key={n.id} className="px-3 py-2.5">
                                   {isPrimary ? (
-                                    <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                                      Primary
+                                    <span
+                                      className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-semibold border ${
+                                        isNodeDown
+                                          ? "bg-red-500/20 text-red-300 border-red-500/40"
+                                          : "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                                      }`}
+                                    >
+                                      <span>Primary</span>
+                                      {isNodeDown && <span className="text-[9px] opacity-75">(DOWN)</span>}
                                     </span>
                                   ) : isReplica ? (
                                     <span
-                                      className={`inline-flex px-2 py-0.5 rounded text-[10px] font-semibold ${
+                                      className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-semibold border ${
                                         isNodeDown
-                                          ? "bg-red-500/20 text-red-300 border border-red-500/40"
-                                          : "bg-blue-500/20 text-blue-300 border border-blue-500/40"
+                                          ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                                          : "bg-blue-500/20 text-blue-300 border-blue-500/40"
                                       }`}
                                     >
-                                      Replica
+                                      <span>Replica</span>
+                                      {isNodeDown && <span className="text-[9px] opacity-75">(DOWN)</span>}
                                     </span>
                                   ) : (
                                     <span className="text-gray-700 text-xs">—</span>

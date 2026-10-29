@@ -14,6 +14,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from backend.app.db.base import Base
 from backend.app.db.session import async_engine
 from backend.app.routers import (
+    assets,
     audit,
     auth,
     batches,
@@ -127,6 +128,7 @@ app.include_router(objects.router)
 app.include_router(storage_admin.router)
 app.include_router(batches.router)
 app.include_router(stream.router)
+app.include_router(assets.router)
 
 
 if __name__ == "__main__":

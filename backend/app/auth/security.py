@@ -35,6 +35,9 @@ def get_jwt_keys() -> tuple[ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKe
         return _jwt_private_key, _jwt_public_key
 
     key_file = settings.JWT_KEY_FILE
+    if not os.path.exists(key_file):
+        key_file = "/tmp/snx_jwt_es256.pem"
+
     if os.path.exists(key_file):
         with open(key_file, "rb") as f:
             key_data = f.read()
@@ -44,9 +47,19 @@ def get_jwt_keys() -> tuple[ec.EllipticCurvePrivateKey, ec.EllipticCurvePublicKe
             _jwt_private_key = loaded_key
             _jwt_public_key = _jwt_private_key.public_key()
     else:
-        # Generate ephemeral keypair if not on disk (e.g. tests / initial dev)
+        # Generate persistent dev keypair
         _jwt_private_key = ec.generate_private_key(ec.SECP256R1())
         _jwt_public_key = _jwt_private_key.public_key()
+        try:
+            pem_bytes = _jwt_private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+            with open("/tmp/snx_jwt_es256.pem", "wb") as f:
+                f.write(pem_bytes)
+        except Exception:
+            pass
 
     return _jwt_private_key, _jwt_public_key
 
