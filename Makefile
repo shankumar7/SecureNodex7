@@ -32,12 +32,15 @@ contracts-test:
 	fi
 
 pki-init:
-	@echo "Initializing PKI (Root & Intermediate CA)..."
-	@python3 -c "print('PKI init script ready for M1')"
+	@echo "Initializing PKI (Root & Intermediate CA, Broker certs)..."
+	@python3 pki/init_pki.py
 
 provision:
-	@echo "Provisioning device: $(LABEL)"
-	@python3 -c "print('Device provisioning tool ready for M1')"
+	@if [ -z "$(LABEL)" ]; then \
+		echo "Usage: make provision LABEL=<device_label> [HOURS=<hours>]"; \
+		exit 1; \
+	fi
+	@python3 pki/provision-device.py --label "$(LABEL)"
 
 chain-up:
 	@echo "Starting Besu / Hardhat local chain..."
