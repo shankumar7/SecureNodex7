@@ -13,7 +13,12 @@ import {
   StoredObject,
 } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8443";
+export const getApiBase = (): string => {
+  if (typeof window !== "undefined") {
+    return `${window.location.protocol}//${window.location.hostname}:8443`;
+  }
+  return process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8443";
+};
 
 class ApiClient {
   private token: string | null = null;
@@ -57,7 +62,7 @@ class ApiClient {
       headers["Content-Type"] = "application/json";
     }
 
-    const res = await fetch(`${API_BASE}${endpoint}`, {
+    const res = await fetch(`${getApiBase()}${endpoint}`, {
       ...options,
       headers,
     });
@@ -205,7 +210,7 @@ class ApiClient {
 
   async downloadObject(id: string): Promise<Blob> {
     const token = this.getToken();
-    const res = await fetch(`${API_BASE}/v1/objects/${id}/download`, {
+    const res = await fetch(`${getApiBase()}/v1/objects/${id}/download`, {
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },

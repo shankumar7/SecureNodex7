@@ -5,22 +5,22 @@
 :root {
   --snx-bg: #f8fafc;
   --snx-card: #ffffff;
-  --snx-border: #e2e8f0;
+  --snx-border: #cbd5e1;
   --snx-text-title: #0f172a;
-  --snx-text-body: #334155;
-  --snx-text-muted: #64748b;
+  --snx-text-body: #1e293b;
+  --snx-text-muted: #334155;
 }
 
 html, body {
-  background-color: var(--snx-bg) !important;
-  color: var(--snx-text-title) !important;
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 /* Background canvas */
 .bg-snx-bg {
-  background-color: var(--snx-bg) !important;
+  background-color: #f8fafc !important;
 }
 
 /* Surface cards & containers */
@@ -32,21 +32,22 @@ header {
 }
 
 header {
-  background-color: rgba(255, 255, 255, 0.9) !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(8px) !important;
-  border-bottom-color: #e2e8f0 !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+  border-bottom-color: #cbd5e1 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
 aside {
   background-color: #ffffff !important;
-  border-right-color: #e2e8f0 !important;
+  border-right-color: #cbd5e1 !important;
 }
 
 footer {
   background-color: #ffffff !important;
-  border-top-color: #e2e8f0 !important;
-  color: #64748b !important;
+  border-top-color: #cbd5e1 !important;
+  color: #334155 !important;
+  font-weight: 500 !important;
 }
 
 /* Borders */
@@ -54,16 +55,17 @@ footer {
 [class*="border-gray-900"],
 [class*="border-gray-800"],
 [class*="border-gray-700"] {
-  border-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
 }
 
-/* Headings & Title texts */
+/* Headings & Title texts - High Contrast Dark */
 h1, h2, h3, h4, h5, h6,
 .text-white {
-  color: var(--snx-text-title) !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
 }
 
-/* Retain pure white text specifically on filled action buttons & badges */
+/* Keep pure white text on filled action buttons */
 button[class*="bg-blue-600"],
 button[class*="bg-blue-500"],
 button[class*="bg-purple-600"],
@@ -94,37 +96,119 @@ button[class*="bg-gradient-"] *,
   color: #ffffff !important;
 }
 
-/* Secondary & Muted text colors */
-.text-gray-100 {
-  color: #0f172a !important;
-}
+/* All Body and Description Texts in Dark High-Contrast Color */
+.text-gray-100,
 .text-gray-200 {
-  color: #1e293b !important;
-}
-.text-gray-300 {
-  color: #334155 !important;
-}
-.text-gray-400 {
-  color: #64748b !important;
-}
-.text-gray-500 {
-  color: #94a3b8 !important;
-}
-
-/* Table styling for light theme */
-thead, thead tr {
-  background-color: #f1f5f9 !important;
-  color: #475569 !important;
-  border-bottom-color: #e2e8f0 !important;
-}
-
-thead th {
-  color: #475569 !important;
+  color: #0f172a !important;
   font-weight: 600 !important;
 }
 
+.text-gray-300,
+.text-gray-400 {
+  color: #1e293b !important;
+  font-weight: 500 !important;
+}
+
+.text-gray-500 {
+  color: #334155 !important;
+  font-weight: 500 !important;
+}
+
+/* Top Banner Modern Light High-Contrast Style */
+.bg-gradient-to-r.from-blue-900\/30 {
+  background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 50%, #f5f3ff 100%) !important;
+  border-color: #bfdbfe !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+.bg-gradient-to-r.from-blue-900\/30 h2 {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+.bg-gradient-to-r.from-blue-900\/30 p {
+  color: #1e293b !important;
+  font-weight: 500 !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.4 !important;
+}
+
+.bg-gradient-to-r.from-blue-900\/30 .inline-flex {
+  background-color: #dbeafe !important;
+  border-color: #93c5fd !important;
+  color: #1e40af !important;
+  font-weight: 600 !important;
+}
+
+.bg-gradient-to-r.from-blue-900\/30 .inline-flex * {
+  color: #1e40af !important;
+}
+
+/* Sidebar navigation links */
+aside .text-\[11px\] {
+  color: #334155 !important;
+  font-weight: 700 !important;
+}
+
+aside button:not(.bg-blue-600) {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+}
+
+aside button:not(.bg-blue-600):hover {
+  background-color: #f1f5f9 !important;
+  color: #2563eb !important;
+}
+
+aside button:not(.bg-blue-600) span {
+  color: inherit !important;
+}
+
+aside .p-3\.5.rounded-xl {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+aside .p-3\.5.rounded-xl span {
+  color: #0f172a !important;
+  font-weight: 600 !important;
+}
+
+aside .p-3\.5.rounded-xl p {
+  color: #334155 !important;
+  font-weight: 500 !important;
+}
+
+/* Metric / Stat Cards in Light Theme */
+.rounded-xl.border,
+.rounded-2xl.border {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Numbers in stat cards */
+.text-2xl.font-bold,
+.text-xl.font-bold,
+.text-lg.font-bold {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+/* Table styling for crisp light theme */
+thead, thead tr {
+  background-color: #f1f5f9 !important;
+  border-bottom: 2px solid #cbd5e1 !important;
+}
+
+thead th {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+}
+
 tbody tr {
-  border-bottom-color: #f1f5f9 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
   background-color: #ffffff !important;
 }
 
@@ -132,117 +216,106 @@ tbody tr:hover {
   background-color: #f8fafc !important;
 }
 
-/* Top Banner Modern Light Gradient */
-.bg-gradient-to-r.from-blue-900\/30 {
-  background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 50%, #faf5ff 100%) !important;
-  border-color: #dbeafe !important;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.05) !important;
+tbody td {
+  color: #1e293b !important;
+  font-weight: 500 !important;
 }
 
-.bg-gradient-to-r.from-blue-900\/30 h2 {
-  color: #1e3a8a !important;
-}
-
-.bg-gradient-to-r.from-blue-900\/30 p {
-  color: #3b82f6 !important;
-}
-
-/* Navigation items in sidebar */
-aside button:not(.bg-blue-600) {
-  color: #475569 !important;
-}
-
-aside button:not(.bg-blue-600):hover {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-
-aside button:not(.bg-blue-600) span {
-  color: inherit !important;
-}
-
-/* Metric / Stat Cards in Light Theme */
-.rounded-xl.border {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03) !important;
-}
-
-/* Pill badges on light backgrounds */
+/* Pill badges on light backgrounds with high contrast */
 .bg-blue-950\/40,
 .bg-blue-500\/10 {
-  background-color: #eff6ff !important;
-  color: #1d4ed8 !important;
-  border-color: #bfdbfe !important;
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  border-color: #93c5fd !important;
+  font-weight: 600 !important;
 }
 
 .bg-emerald-950\/40,
 .bg-emerald-500\/10 {
-  background-color: #ecfdf5 !important;
-  color: #047857 !important;
-  border-color: #a7f3d0 !important;
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+  border-color: #6ee7b7 !important;
+  font-weight: 600 !important;
 }
 
 .bg-purple-950\/40,
 .bg-purple-500\/10 {
-  background-color: #faf5ff !important;
-  color: #6b21a8 !important;
-  border-color: #e9d5ff !important;
+  background-color: #f3e8ff !important;
+  color: #581c87 !important;
+  border-color: #d8b4fe !important;
+  font-weight: 600 !important;
 }
 
 .bg-yellow-950\/40,
 .bg-yellow-500\/10 {
-  background-color: #fffbeb !important;
-  color: #b45309 !important;
-  border-color: #fde68a !important;
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #fcd34d !important;
+  font-weight: 600 !important;
 }
 
 .bg-red-950\/40,
 .bg-red-500\/10 {
-  background-color: #fef2f2 !important;
-  color: #b91c1c !important;
-  border-color: #fecaca !important;
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  border-color: #fca5a5 !important;
+  font-weight: 600 !important;
 }
 
 /* Center Status Pills in Navbar */
 header .rounded-full.bg-gray-900 {
   background-color: #f1f5f9 !important;
-  border-color: #e2e8f0 !important;
-  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-weight: 600 !important;
 }
 
 header .rounded-full.bg-gray-900 span {
-  color: #334155 !important;
+  color: #0f172a !important;
+  font-weight: 600 !important;
+}
+
+/* User profile button in Navbar */
+header button.bg-gray-900\/90 {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+header button.bg-gray-900\/90 p {
+  color: #0f172a !important;
+  font-weight: 700 !important;
 }
 
 /* Modals & Popups */
 .fixed .bg-gray-900,
 .fixed .bg-gray-950 {
   background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
 }
 
 .fixed input,
 .fixed select,
 .fixed textarea {
-  background-color: #f8fafc !important;
-  border-color: #cbd5e1 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
   color: #0f172a !important;
+  font-weight: 500 !important;
 }
 
 .fixed input:focus,
 .fixed select:focus,
 .fixed textarea:focus {
-  border-color: #3b82f6 !important;
-  background-color: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
 }
 
 /* Action buttons in tables (Placement, Verify, Download) */
 table button {
   background-color: #f1f5f9 !important;
-  border-color: #e2e8f0 !important;
-  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-weight: 600 !important;
   transition: all 0.15s ease-in-out !important;
 }
 
@@ -253,33 +326,33 @@ table button:hover {
 
 table button:has(svg.text-purple-400),
 table button.text-purple-300 {
-  background-color: #faf5ff !important;
-  border-color: #e9d5ff !important;
-  color: #6b21a8 !important;
+  background-color: #f3e8ff !important;
+  border-color: #d8b4fe !important;
+  color: #581c87 !important;
 }
 table button:has(svg.text-purple-400):hover,
 table button.text-purple-300:hover {
-  background-color: #f3e8ff !important;
+  background-color: #e9d5ff !important;
 }
 
 table button:has(svg.text-emerald-400),
 table button.text-emerald-300 {
-  background-color: #ecfdf5 !important;
-  border-color: #a7f3d0 !important;
-  color: #047857 !important;
+  background-color: #d1fae5 !important;
+  border-color: #6ee7b7 !important;
+  color: #065f46 !important;
 }
 table button:has(svg.text-emerald-400):hover,
 table button.text-emerald-300:hover {
-  background-color: #d1fae5 !important;
+  background-color: #a7f3d0 !important;
 }
 
 table button:has(svg.text-blue-400),
 table button.text-blue-300 {
-  background-color: #eff6ff !important;
-  border-color: #bfdbfe !important;
-  color: #1d4ed8 !important;
+  background-color: #dbeafe !important;
+  border-color: #93c5fd !important;
+  color: #1e40af !important;
 }
 table button:has(svg.text-blue-400):hover,
 table button.text-blue-300:hover {
-  background-color: #dbeafe !important;
+  background-color: #bfdbfe !important;
 }

@@ -77,8 +77,9 @@ function DashboardContent() {
     let fallbackInterval: any = null;
 
     try {
-      const wsUrl = (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8443")
-        .replace(/^http/, "ws") + "/v1/stream?topics=telemetry,devices,audit";
+      const host = typeof window !== "undefined" ? window.location.hostname : "localhost";
+      const proto = typeof window !== "undefined" && window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${proto}//${host}:8443/v1/stream?topics=telemetry,devices,audit`;
 
       ws = new WebSocket(wsUrl);
 
