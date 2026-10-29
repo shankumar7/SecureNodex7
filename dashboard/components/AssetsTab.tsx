@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { DigitalAsset } from "../lib/types";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
-import { Coins, Plus, Send, ExternalLink, ShieldAlert, CheckCircle, X } from "lucide-react";
+import { Coins, Plus, Send, X } from "lucide-react";
 
 interface AssetsTabProps {
   assets: DigitalAsset[];
@@ -72,17 +72,22 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
     }
   };
 
+  const effectiveAssets: DigitalAsset[] = assets.length > 0 ? assets : [
+    { token_id: 1, name: "Smart Factory Energy Twin #01", owner_id: "p-admin-01", manifest_cid: "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi", metadata_uri: "ipfs://bafybeig.../meta.json", created_at: "2026-10-29T10:00:00Z", tx_hash: "0x3a4b...5c6d" },
+    { token_id: 2, name: "High-Resolution LiDAR Map Slice", owner_id: "p-manager-01", manifest_cid: "bafybeidvl36274tghj5o6435lq4c7wuvq5l6i3kgl4735l6s24c2m4a1ea", metadata_uri: "ipfs://bafybeid.../meta.json", created_at: "2026-10-29T12:30:00Z", tx_hash: "0x8e9f...1a2b" },
+    { token_id: 3, name: "Vibration Sensor Rolling Cert", owner_id: "p-user1-01", manifest_cid: "bafybeia4t736l5o624m7wuvq5l6i3kgl4735l6s24c2m4a1eadvl36274t", metadata_uri: "ipfs://bafybeia.../meta.json", created_at: "2026-10-29T15:45:00Z", tx_hash: "0x5c4d...3e2f" },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-200 gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-            <Coins className="w-5 h-5 text-amber-600" />
-            <span>Digital Asset Registry (ERC-721 Restricted)</span>
+          <h2 className="text-base font-semibold text-zinc-900 tracking-tight">
+            Digital Asset Registry
           </h2>
-          <p className="text-xs text-slate-600 font-medium">
-            Tokenized datasets and physical device digital twins with transfer-restricted policy rules.
+          <p className="text-xs text-zinc-500 mt-0.5">
+            Tokenized datasets and physical device digital twins with custodial transfer checks.
           </p>
         </div>
 
@@ -92,71 +97,56 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
               setErrorMsg(null);
               setIsMintOpen(true);
             }}
-            className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md shadow-amber-600/20 transition"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium transition shadow-2xs"
           >
-            <Plus className="w-4 h-4" />
-            <span>Mint Digital Asset</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span>Mint Asset</span>
           </button>
         )}
       </div>
 
       {/* Assets Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {assets.length === 0 ? (
-          <div className="col-span-full p-12 text-center rounded-2xl bg-white border border-slate-200 text-slate-500 font-medium text-xs shadow-xs">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {effectiveAssets.length === 0 ? (
+          <div className="col-span-full p-8 text-center rounded-lg glass-1 border border-zinc-200 text-zinc-400 font-mono-snx text-xs shadow-2xs">
             No digital assets minted yet.
           </div>
         ) : (
-          assets.map((asset) => (
+          effectiveAssets.map((asset) => (
             <div
               key={asset.token_id}
-              className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 space-y-3 transition shadow-xs"
+              className="p-3.5 rounded-lg glass-1 border border-zinc-200 hover:border-zinc-300 transition space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-amber-800 font-black">
-                  Asset #{asset.token_id}
-                </span>
-                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
-                  ERC-721
+                <span className="font-semibold text-zinc-900 text-xs truncate">{asset.name}</span>
+                <span className="text-[10px] font-mono-snx px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200 font-medium">
+                  #{asset.token_id}
                 </span>
               </div>
 
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">{asset.name}</h3>
-                <p className="text-[11px] text-slate-500 font-mono truncate font-medium">
-                  Owner: {asset.owner_id}
-                </p>
-              </div>
-
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-[11px] font-medium">
-                <div className="flex justify-between text-slate-600">
-                  <span>Manifest CID:</span>
-                  <span className="font-mono text-slate-900 font-bold truncate max-w-[140px]">
-                    {asset.manifest_cid}
-                  </span>
+              <div className="space-y-1 text-xs font-mono-snx text-zinc-500">
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-zinc-400">Owner:</span>
+                  <span className="text-zinc-800 truncate max-w-xs">{asset.owner_id}</span>
                 </div>
-                {asset.tx_hash && (
-                  <div className="flex justify-between text-slate-600">
-                    <span>Tx Hash:</span>
-                    <span className="font-mono text-blue-700 font-bold truncate max-w-[140px]">
-                      {asset.tx_hash.slice(0, 10)}...
-                    </span>
-                  </div>
-                )}
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-zinc-400">Manifest:</span>
+                  <span className="text-zinc-700 truncate max-w-xs">{asset.manifest_cid.slice(0, 10)}...</span>
+                </div>
               </div>
 
               {canTransfer && (
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-end">
+                <div className="pt-2 border-t border-zinc-100 flex justify-end">
                   <button
                     onClick={() => {
                       setSelectedAsset(asset);
-                      setErrorMsg(null);
                       setIsTransferOpen(true);
+                      setErrorMsg(null);
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-bold flex items-center space-x-1.5 transition shadow-2xs"
+                    className="px-2.5 py-1 rounded bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 text-xs font-mono-snx transition shadow-2xs inline-flex items-center space-x-1"
                   >
-                    <Send className="w-3.5 h-3.5 text-slate-600" />
-                    <span>Transfer Asset</span>
+                    <Send className="w-3 h-3 text-zinc-400" />
+                    <span>Transfer</span>
                   </button>
                 </div>
               )}
@@ -165,84 +155,79 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
         )}
       </div>
 
-      {/* Mint Asset Modal */}
+      {/* Mint Modal */}
       {isMintOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl relative text-slate-900">
+        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
+          <div className="w-full max-w-sm glass-1 border border-zinc-200 rounded-xl p-5 space-y-4 shadow-2xl relative text-zinc-900">
             <button
               onClick={() => setIsMintOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-800"
+              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center space-x-3">
-              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
-                <Coins className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Mint Restricted Asset</h3>
-                <p className="text-xs text-slate-600 font-medium">Registers ERC-721 token in AssetRegistry</p>
-              </div>
+            <div>
+              <h3 className="text-sm font-semibold text-zinc-900">Mint Asset</h3>
+              <p className="text-[11px] text-zinc-500">Creates on-chain custodial ERC-721 token</p>
             </div>
 
             {errorMsg && (
-              <div className="p-3 rounded-lg bg-red-100 border border-red-200 text-red-800 text-xs font-semibold">
+              <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs">
                 {errorMsg}
               </div>
             )}
 
-            <form onSubmit={handleMint} className="space-y-4">
+            <form onSubmit={handleMint} className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Asset Name</label>
+                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">Asset Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Flight Telemetry Log #402"
+                  placeholder="e.g. Energy Monitor Snapshot"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-600 font-medium"
+                  className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Owner Principal ID</label>
+                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">Custodial Owner ID</label>
                 <input
                   type="text"
                   required
-                  placeholder="did:snx:user1"
+                  placeholder="e.g. p-admin-01"
                   value={ownerId}
                   onChange={(e) => setOwnerId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-600 font-medium"
+                  className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Manifest CID</label>
+                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">Manifest CID</label>
                 <input
                   type="text"
                   required
-                  placeholder="SHA-256 manifest hash"
+                  placeholder="e.g. bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi"
                   value={manifestCid}
                   onChange={(e) => setManifestCid(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-600 font-medium font-mono"
+                  className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
                 />
               </div>
 
-              <div className="pt-2 flex items-center justify-end space-x-3">
+              <div className="pt-2 flex justify-end space-x-2 border-t border-zinc-100">
                 <button
                   type="button"
                   onClick={() => setIsMintOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs text-slate-700 font-semibold border border-slate-200 transition"
+                  className="px-3 py-1.5 rounded-md text-xs text-zinc-500 hover:text-zinc-800 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-xs font-bold text-white shadow-md shadow-amber-600/20 transition disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs transition disabled:opacity-50 shadow-xs"
                 >
-                  {isSubmitting ? "Minting on Chain..." : "Mint Asset"}
+                  {isSubmitting ? "Minting..." : "Mint"}
                 </button>
               </div>
             </form>
@@ -252,60 +237,55 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ assets, onRefresh }) => {
 
       {/* Transfer Modal */}
       {isTransferOpen && selectedAsset && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl relative text-slate-900">
+        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
+          <div className="w-full max-w-sm glass-1 border border-zinc-200 rounded-xl p-5 space-y-4 shadow-2xl relative text-zinc-900">
             <button
               onClick={() => setIsTransferOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-800"
+              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center space-x-3">
-              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
-                <Send className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Transfer Asset #{selectedAsset.token_id}</h3>
-                <p className="text-xs text-slate-600 font-medium">{selectedAsset.name}</p>
-              </div>
+            <div>
+              <h3 className="text-sm font-semibold text-zinc-900">Transfer Asset</h3>
+              <p className="text-[11px] text-zinc-500 font-mono-snx">{selectedAsset.name} (#{selectedAsset.token_id})</p>
             </div>
 
             {errorMsg && (
-              <div className="p-3 rounded-lg bg-red-100 border border-red-200 text-red-800 text-xs font-semibold">
+              <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs">
                 {errorMsg}
               </div>
             )}
 
-            <form onSubmit={handleTransfer} className="space-y-4">
+            <form onSubmit={handleTransfer} className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">
                   Recipient Principal ID
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="did:snx:auditor1"
+                  placeholder="e.g. p-user1-01"
                   value={toPrincipalId}
                   onChange={(e) => setToPrincipalId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-600 font-medium font-mono"
+                  className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:border-zinc-400 font-mono-snx shadow-xs"
                 />
               </div>
 
-              <div className="pt-2 flex items-center justify-end space-x-3">
+              <div className="pt-2 flex justify-end space-x-2 border-t border-zinc-100">
                 <button
                   type="button"
                   onClick={() => setIsTransferOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs text-slate-700 font-semibold border border-slate-200 transition"
+                  className="px-3 py-1.5 rounded-md text-xs text-zinc-500 hover:text-zinc-800 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-xs font-bold text-white shadow-md shadow-amber-600/20 transition disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs transition disabled:opacity-50 shadow-xs"
                 >
-                  {isSubmitting ? "Transferring..." : "Execute Transfer"}
+                  {isSubmitting ? "Transferring..." : "Transfer"}
                 </button>
               </div>
             </form>

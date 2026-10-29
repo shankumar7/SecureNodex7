@@ -161,43 +161,61 @@ function DashboardContent() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-snx-bg text-gray-900">
-      <Navbar wsConnected={wsConnected} />
+    <div className="flex min-h-screen flex-col bg-[#06091A] text-white selection:bg-indigo-900/60 relative overflow-hidden">
+      {/* Dot grid */}
+      <div className="absolute inset-0 bg-dot-grid pointer-events-none z-0 opacity-70" />
 
-      <div className="flex-1 flex overflow-hidden">
-        <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} />
+      {/* Drifting orbs — larger, more vivid */}
+      <div className="orb orb-indigo w-[800px] h-[800px] top-[-250px] left-[-180px] z-0 opacity-25" />
+      <div className="orb orb-violet w-[600px] h-[600px] top-[25%] right-[-150px] z-0 opacity-20" />
+      <div className="orb orb-cyan   w-[500px] h-[500px] bottom-[5%]  left-[15%]   z-0 opacity-18" />
+      <div className="orb orb-emerald w-[450px] h-[450px] bottom-[-100px] right-[5%]  z-0 opacity-15" />
 
-        <main className="flex-1 overflow-y-auto p-6 max-w-7xl w-full mx-auto">
-          {activeTab === "overview" && <OverviewTab stats={stats} />}
-          {activeTab === "devices" && (
-            <DevicesTab devices={devices} onRefresh={refreshData} />
-          )}
-          {activeTab === "telemetry" && (
-            <TelemetryTab messages={telemetryMessages} />
-          )}
-          {activeTab === "objects" && (
-            <ObjectsTab objects={objects} nodes={nodes} onRefresh={refreshData} />
-          )}
-          {activeTab === "storage" && (
-            <StorageHealthTab health={health} nodes={nodes} onRefresh={refreshData} />
-          )}
-          {activeTab === "assets" && (
-            <AssetsTab assets={assets} onRefresh={refreshData} />
-          )}
-          {activeTab === "audit" && (
-            <AuditTab events={auditEvents} onRefresh={refreshData} />
-          )}
-          {activeTab === "principals" && (
-            <PrincipalsTab principals={principals} onRefresh={refreshData} />
-          )}
-        </main>
+      <div className="relative z-10 flex flex-col flex-1 min-h-screen">
+        <Navbar wsConnected={wsConnected} />
+
+        <div className="flex-1 flex overflow-hidden">
+          <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} />
+
+          <main className="flex-1 overflow-y-auto p-6 md:p-8">
+            {activeTab === "overview" && <OverviewTab stats={stats} />}
+            {activeTab === "devices" && (
+              <DevicesTab devices={devices} onRefresh={refreshData} />
+            )}
+            {activeTab === "telemetry" && (
+              <TelemetryTab messages={telemetryMessages} />
+            )}
+            {activeTab === "objects" && (
+              <ObjectsTab objects={objects} nodes={nodes} onRefresh={refreshData} />
+            )}
+            {activeTab === "storage" && (
+              <StorageHealthTab health={health} nodes={nodes} onRefresh={refreshData} />
+            )}
+            {activeTab === "assets" && (
+              <AssetsTab assets={assets} onRefresh={refreshData} />
+            )}
+            {activeTab === "audit" && (
+              <AuditTab events={auditEvents} onRefresh={refreshData} />
+            )}
+            {activeTab === "principals" && (
+              <PrincipalsTab principals={principals} onRefresh={refreshData} />
+            )}
+          </main>
+        </div>
+
+        <footer className="glass-1 border-t border-white/[0.09] py-3 px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 dot-live text-emerald-400" />
+            <span className="text-[11px] font-mono-snx text-white/38">SecureNodeX Edge Consensus · Chain 20260 (QBFT)</span>
+          </div>
+          <div className="text-[11px] font-mono-snx text-white/22">
+            NIST P-256 ECC &bull; HRW Quorum N=4 R=3 W=2 &bull; ES256 Nonce Verification
+          </div>
+        </footer>
       </div>
-
-      <footer className="border-t border-slate-200 bg-white py-3.5 px-6 text-center text-xs text-slate-600 font-semibold shadow-xs">
-        SecureNodeX IoT Trust & Storage Platform &copy; 2026 | Team CodeCommit | Smart India Hackathon
-      </footer>
     </div>
   );
+
 }
 
 export default function DashboardHome() {

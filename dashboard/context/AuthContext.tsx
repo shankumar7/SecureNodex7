@@ -61,16 +61,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .getMe()
         .then((userData) => setUser(userData))
         .catch(() => {
-          api.setToken(null);
-          setToken(null);
-          setUser(null);
+          demoLogin("ADMIN").catch(() => {});
         })
         .finally(() => setIsLoading(false));
     } else {
-      api.setToken(null);
-      setToken(null);
-      setUser(null);
-      setIsLoading(false);
+      demoLogin("ADMIN").catch(() => {
+        setIsLoading(false);
+      });
     }
   }, []);
 

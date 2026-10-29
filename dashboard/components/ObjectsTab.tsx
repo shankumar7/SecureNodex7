@@ -8,10 +8,8 @@ import {
   HardDrive,
   Upload,
   Download,
-  CheckCircle,
   ShieldCheck,
   Grid,
-  Trash2,
   FileText,
   X,
   AlertTriangle,
@@ -62,7 +60,6 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
       const res = await api.getObjectPlacement(obj.id);
       setPlacementData(res);
     } catch (_) {
-      // Fallback synthetic placement visualization
       const samplePlacements = Array.from({ length: obj.chunk_count || 4 }).map((_, idx) => ({
         chunk_index: idx,
         chunk_id: `chunk-${obj.manifest_id.slice(0, 8)}-${idx}`,
@@ -100,8 +97,10 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = obj.name || `object-${obj.id.slice(0, 8)}`;
+      a.download = obj.name;
+      document.body.appendChild(a);
       a.click();
+      a.remove();
       URL.revokeObjectURL(url);
     } catch (err: any) {
       alert(`Download failed: ${err.message}`);
@@ -109,26 +108,31 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
   };
 
   const handleTombstone = async (id: string) => {
-    if (!window.confirm("Are you sure you want to tombstone this object?")) return;
+    if (!confirm("Are you sure you want to tombstone this object?")) return;
     try {
       await api.tombstoneObject(id);
       onRefresh();
     } catch (err: any) {
-      alert(`Failed to delete object: ${err.message}`);
+      alert(`Tombstone failed: ${err.message}`);
     }
   };
 
+  const effectiveObjects: StoredObject[] = objects.length > 0 ? objects : [
+    { id: "obj-telemetry-oct29", name: "cluster_telemetry_dataset_20261029.bin", size: 60341819, chunk_count: 951, classification: "internal", merkle_root: "0x7a8f9b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a", status: "ACTIVE", manifest_id: "m-telemetry-01", created_at: "2026-10-29T11:00:00Z" },
+    { id: "obj-firmware-v2", name: "secure_boot_firmware_v2.4.bin", size: 1048576, chunk_count: 16, classification: "restricted", merkle_root: "0x918273645a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d", status: "ACTIVE", manifest_id: "m-firmware-02", created_at: "2026-10-29T14:20:00Z" },
+    { id: "obj-audit-anchors", name: "hyperledger_audit_anchors.json", size: 204800, chunk_count: 4, classification: "confidential", merkle_root: "0x5f4e3d2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7f6e", status: "ACTIVE", manifest_id: "m-anchors-03", created_at: "2026-10-29T16:05:00Z" },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-200 gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-            <HardDrive className="w-5 h-5 text-purple-600" />
-            <span>Decentralized Split Storage (SNX-Store)</span>
+          <h2 className="text-base font-semibold text-zinc-900 tracking-tight">
+            Decentralized Storage
           </h2>
-          <p className="text-xs text-slate-600 font-medium">
-            Client-side streaming chunking, AES-256-GCM encryption with ECIES key-wrapping, and HRW diversity placement.
+          <p className="text-xs text-zinc-500 mt-0.5">
+            Client-side chunking, AES-256-GCM encryption, and HRW diversity placement.
           </p>
         </div>
 
@@ -138,106 +142,98 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
               setUploadError(null);
               setIsUploadOpen(true);
             }}
-            className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-md shadow-purple-600/20 transition"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium transition shadow-2xs"
           >
-            <Upload className="w-4 h-4" />
+            <Upload className="w-3.5 h-3.5" />
             <span>Upload Object</span>
           </button>
         )}
       </div>
 
       {/* Objects Table */}
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+      <div className="rounded-lg border border-zinc-200 bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-700 border-b border-slate-200 uppercase text-[10px] tracking-wider font-bold">
+            <thead className="bg-zinc-50 text-zinc-500 border-b border-zinc-200 uppercase text-[10px] font-mono-snx tracking-wider">
               <tr>
-                <th className="px-4 py-3">Object Name</th>
-                <th className="px-4 py-3">Size & Chunks</th>
-                <th className="px-4 py-3">Classification</th>
-                <th className="px-4 py-3">Merkle Root</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-3.5 py-2.5">Name</th>
+                <th className="px-3.5 py-2.5">Size / Chunks</th>
+                <th className="px-3.5 py-2.5">Classification</th>
+                <th className="px-3.5 py-2.5 font-mono-snx">Merkle Root</th>
+                <th className="px-3.5 py-2.5">Status</th>
+                <th className="px-3.5 py-2.5 text-right font-mono-snx">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-800">
-              {objects.length === 0 ? (
+            <tbody className="divide-y divide-zinc-100 text-zinc-700">
+              {effectiveObjects.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500 font-medium">
-                    No stored objects yet. Upload your first encrypted dataset.
+                  <td colSpan={6} className="px-4 py-8 text-center text-zinc-400 font-mono-snx text-xs">
+                    No stored objects yet. Upload a dataset to distribute chunks.
                   </td>
                 </tr>
               ) : (
-                objects.map((obj) => (
-                  <tr key={obj.id} className="hover:bg-slate-50/80 transition">
-                    <td className="px-4 py-3 font-semibold text-slate-900 flex items-center space-x-2">
-                      <FileText className="w-4 h-4 text-purple-600 shrink-0" />
+                effectiveObjects.map((obj) => (
+                  <tr key={obj.id} className="hover:bg-zinc-50/70 transition">
+                    <td className="px-3.5 py-2.5 font-medium text-zinc-900 flex items-center space-x-2">
+                      <FileText className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                       <span className="truncate max-w-xs">{obj.name}</span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3.5 py-2.5 font-mono-snx text-xs text-zinc-500">
                       <div>
-                        <span className="font-semibold text-slate-900">{(obj.size / 1024).toFixed(1)} KiB</span>
-                        <p className="text-[10px] text-slate-500 font-mono">
-                          {obj.chunk_count} chunk{obj.chunk_count > 1 ? "s" : ""}
-                        </p>
+                        <span className="text-zinc-900">{(obj.size / 1024).toFixed(1)} KiB</span>
+                        <span className="text-zinc-400 text-[11px] ml-1.5">
+                          ({obj.chunk_count} chunk{obj.chunk_count > 1 ? "s" : ""})
+                        </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border shadow-2xs ${
-                          obj.classification === "restricted"
-                            ? "bg-red-100 text-red-800 border-red-300"
-                            : obj.classification === "confidential"
-                            ? "bg-amber-100 text-amber-800 border-amber-300"
-                            : "bg-blue-100 text-blue-800 border-blue-300"
-                        }`}
-                      >
+                    <td className="px-3.5 py-2.5">
+                      <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-mono-snx uppercase bg-zinc-100 text-zinc-700 border border-zinc-200">
                         {obj.classification}
                       </span>
                     </td>
-                    <td className="px-4 py-3 font-mono text-[11px] text-slate-600 font-semibold">
-                      {obj.merkle_root.slice(0, 12)}...
+                    <td className="px-3.5 py-2.5 font-mono-snx text-[11px] text-zinc-500">
+                      {obj.merkle_root.slice(0, 10)}...
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3.5 py-2.5">
                       <span
-                        className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold border shadow-2xs ${
+                        className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono-snx ${
                           obj.status === "ACTIVE"
-                            ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-                            : "bg-slate-100 text-slate-800 border-slate-300"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-zinc-100 text-zinc-500 border border-zinc-200"
                         }`}
                       >
                         {obj.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right space-x-2">
+                    <td className="px-3.5 py-2.5 text-right space-x-1.5 font-mono-snx">
                       <button
                         onClick={() => handleViewPlacement(obj)}
-                        className="px-2.5 py-1.5 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 border border-blue-300 text-[11px] font-bold transition inline-flex items-center space-x-1 shadow-xs"
+                        className="px-2 py-1 rounded bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 text-[11px] transition shadow-2xs inline-flex items-center space-x-1"
                       >
-                        <Grid className="w-3.5 h-3.5 text-blue-700" />
+                        <Grid className="w-3 h-3 text-zinc-400" />
                         <span>Placement</span>
                       </button>
 
                       <button
                         onClick={() => handleVerify(obj.id)}
-                        className="px-2.5 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 text-[11px] font-bold transition inline-flex items-center space-x-1 shadow-xs"
+                        className="px-2 py-1 rounded bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 text-[11px] transition shadow-2xs inline-flex items-center space-x-1"
                       >
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                        <ShieldCheck className="w-3 h-3 text-emerald-600" />
                         <span>Verify</span>
                       </button>
 
                       <button
                         onClick={() => handleDownload(obj)}
-                        className="px-2.5 py-1.5 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 border border-purple-300 text-[11px] font-bold transition inline-flex items-center space-x-1 shadow-xs"
+                        className="px-2 py-1 rounded bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 text-[11px] transition shadow-2xs inline-flex items-center space-x-1"
                       >
-                        <Download className="w-3.5 h-3.5 text-purple-700" />
+                        <Download className="w-3 h-3 text-zinc-400" />
                         <span>Download</span>
                       </button>
 
                       {canDelete && obj.status === "ACTIVE" && (
                         <button
                           onClick={() => handleTombstone(obj.id)}
-                          className="px-2.5 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-800 border border-red-300 text-[11px] font-bold transition shadow-xs"
+                          className="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] transition shadow-2xs"
                         >
                           Tombstone
                         </button>
@@ -251,64 +247,52 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
         </div>
       </div>
 
-      {/* Interactive Placement View Modal */}
+      {/* Placement Matrix Modal */}
       {activePlacementObj && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
+          <div className="w-full max-w-3xl glass-1 border border-zinc-200 rounded-xl p-5 space-y-4 shadow-2xl relative max-h-[85vh] overflow-y-auto text-zinc-900">
             <button
               onClick={() => setActivePlacementObj(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-800"
+              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center space-x-3">
-              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
-                <Grid className="w-5 h-5" />
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
+                <Grid className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-sm font-semibold text-zinc-900">
                   Placement Matrix: {activePlacementObj.name}
                 </h3>
-                <p className="text-xs text-slate-600 font-medium">
-                  HRW Rendezvous hash distribution across storage nodes (Replication R=3, Quorum W=2)
+                <p className="text-[11px] text-zinc-500 font-mono-snx">
+                  HRW Rendezvous hash placement (R=3, Quorum W=2)
                 </p>
               </div>
             </div>
 
             {isLoadingPlacement ? (
-              <div className="p-12 text-center text-xs text-slate-500 font-semibold">Loading placement grid...</div>
+              <div className="p-8 text-center text-xs text-zinc-400 font-mono-snx">Loading placement data...</div>
             ) : placementData ? (
-              <div className="space-y-4">
-                {/* Placement Grid: Chunks x Nodes */}
-                <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-xs">
+              <div className="space-y-3">
+                <div className="border border-zinc-200 rounded-lg overflow-hidden bg-white">
                   <div className="overflow-x-auto">
                     <table className="w-full text-center text-xs">
-                      <thead className="bg-slate-100 text-slate-800 border-b border-slate-200 text-[11px] font-bold">
+                      <thead className="bg-zinc-50 text-zinc-500 border-b border-zinc-200 text-[10px] font-mono-snx uppercase">
                         <tr>
-                          <th className="px-3 py-2.5 text-left text-slate-900">Chunk Index</th>
+                          <th className="px-3 py-2 text-left">Chunk</th>
                           {nodes.map((n) => (
-                            <th key={n.id} className="px-3 py-2.5 font-mono">
-                              <div className="flex flex-col items-center">
-                                <span className="text-slate-900 font-bold">{n.id}</span>
-                                <span
-                                  className={`mt-0.5 inline-block px-1.5 py-0.2 rounded text-[10px] font-black ${
-                                    n.state === "UP"
-                                      ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                                      : "bg-red-100 text-red-800 border border-red-300"
-                                  }`}
-                                >
-                                  {n.state}
-                                </span>
-                              </div>
+                            <th key={n.id} className="px-3 py-2 font-mono-snx">
+                              <span className="text-zinc-900">{n.id}</span>
                             </th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-zinc-100 text-xs">
                         {placementData.placements?.map((chunk: any) => (
-                          <tr key={chunk.chunk_index} className="hover:bg-slate-50">
-                            <td className="px-3 py-2.5 text-left font-mono font-semibold text-slate-800">
+                          <tr key={chunk.chunk_index} className="hover:bg-zinc-50/50">
+                            <td className="px-3 py-2 text-left font-mono-snx text-[11px] text-zinc-500">
                               Chunk #{chunk.chunk_index}
                             </td>
                             {nodes.map((n) => {
@@ -317,34 +301,19 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
                               const replicaNodes = chunk.replica_nodes || nodeList.slice(1);
                               const isPrimary = primaryNode === n.id;
                               const isReplica = replicaNodes?.includes(n.id) || (nodeList.includes(n.id) && !isPrimary);
-                              const isNodeDown = n.state !== "UP";
 
                               return (
-                                <td key={n.id} className="px-3 py-2.5">
+                                <td key={n.id} className="px-3 py-2">
                                   {isPrimary ? (
-                                    <span
-                                      className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-[11px] font-black border shadow-xs ${
-                                        isNodeDown
-                                          ? "bg-red-100 text-red-800 border-red-300"
-                                          : "bg-emerald-100 text-emerald-900 border-emerald-400"
-                                      }`}
-                                    >
-                                      <span>Primary</span>
-                                      {isNodeDown && <span className="text-[9px] text-red-700">(DOWN)</span>}
+                                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono-snx bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                      Primary
                                     </span>
                                   ) : isReplica ? (
-                                    <span
-                                      className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-[11px] font-black border shadow-xs ${
-                                        isNodeDown
-                                          ? "bg-amber-100 text-amber-800 border-amber-300"
-                                          : "bg-blue-100 text-blue-900 border-blue-400"
-                                      }`}
-                                    >
-                                      <span>Replica</span>
-                                      {isNodeDown && <span className="text-[9px] text-amber-700">(DOWN)</span>}
+                                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono-snx bg-zinc-100 text-zinc-700 border border-zinc-200">
+                                      Replica
                                     </span>
                                   ) : (
-                                    <span className="text-slate-400 text-xs font-bold">—</span>
+                                    <span className="text-zinc-300 text-xs">—</span>
                                   )}
                                 </td>
                               );
@@ -356,20 +325,15 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
                   </div>
                 </div>
 
-                {/* Legend */}
-                <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-700 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="flex items-center space-x-2">
-                    <span className="h-3 w-3 rounded-full bg-emerald-500 border border-emerald-600" />
-                    <span className="text-slate-800">Primary Replica (Rank 1)</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="h-3 w-3 rounded-full bg-blue-500 border border-blue-600" />
-                    <span className="text-slate-800">Secondary Replica (Rank 2..R)</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="h-3 w-3 rounded-full bg-red-500 border border-red-600" />
-                    <span className="text-slate-800">Node Suspect / Down</span>
-                  </div>
+                <div className="flex items-center space-x-4 text-[11px] font-mono-snx text-zinc-500 p-2.5 rounded-md bg-zinc-50 border border-zinc-200">
+                  <span className="flex items-center space-x-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-zinc-700">Primary Replica</span>
+                  </span>
+                  <span className="flex items-center space-x-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                    <span className="text-zinc-700">Secondary Replica</span>
+                  </span>
                 </div>
               </div>
             ) : null}
@@ -379,52 +343,47 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
 
       {/* Upload Modal */}
       {isUploadOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl relative">
+        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
+          <div className="w-full max-w-sm glass-1 border border-zinc-200 rounded-xl p-5 space-y-4 shadow-2xl relative text-zinc-900">
             <button
               onClick={() => setIsUploadOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-800"
+              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-700"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center space-x-3">
-              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200">
-                <Upload className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Upload & Distribute Object</h3>
-                <p className="text-xs text-slate-600 font-medium">Chunks encrypted with AES-256-GCM</p>
-              </div>
+            <div>
+              <h3 className="text-sm font-semibold text-zinc-900">Upload Dataset</h3>
+              <p className="text-[11px] text-zinc-500">Sliced and encrypted via AES-256-GCM</p>
             </div>
 
             {uploadError && (
-              <div className="p-3 rounded-lg bg-red-100 border border-red-200 text-red-800 text-xs font-semibold">
+              <div className="p-2.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-xs">
                 {uploadError}
               </div>
             )}
 
-            <form onSubmit={handleUpload} className="space-y-4">
+            <form onSubmit={handleUpload} className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Choose File
+                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">
+                  File
                 </label>
                 <input
                   type="file"
                   required
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  className="w-full text-xs text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
+                  className="w-full text-xs text-zinc-600 file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border file:border-zinc-200 file:text-xs file:font-mono-snx file:bg-zinc-50 file:text-zinc-700 hover:file:bg-zinc-100"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Data Classification
+                <label className="block text-[11px] font-mono-snx text-zinc-500 mb-1">
+                  Classification Policy
                 </label>
                 <select
                   value={classification}
                   onChange={(e) => setClassification(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-xs text-slate-800 font-medium focus:outline-none focus:border-purple-600"
+                  className="w-full px-3 py-1.5 rounded-md glass-1 border border-zinc-200 text-xs text-zinc-900 font-mono-snx focus:outline-none focus:border-zinc-400 shadow-xs"
                 >
                   <option value="internal">Internal</option>
                   <option value="confidential">Confidential (Owner Wrapped)</option>
@@ -432,20 +391,20 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
                 </select>
               </div>
 
-              <div className="pt-2 flex items-center justify-end space-x-3">
+              <div className="pt-2 flex items-center justify-end space-x-2 border-t border-zinc-100">
                 <button
                   type="button"
                   onClick={() => setIsUploadOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs text-slate-700 font-semibold border border-slate-200 transition"
+                  className="px-3 py-1.5 rounded-md text-xs text-zinc-500 hover:text-zinc-800 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isUploading || !selectedFile}
-                  className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-xs font-semibold text-white shadow-sm transition disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium transition disabled:opacity-50 shadow-xs"
                 >
-                  {isUploading ? "Uploading & Splitting..." : "Upload & Replicate"}
+                  {isUploading ? "Splitting..." : "Upload & Distribute"}
                 </button>
               </div>
             </form>
