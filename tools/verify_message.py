@@ -26,6 +26,7 @@ def main() -> None:
 
     pem_bytes = Path(args.key_or_cert).read_bytes()
 
+    pub_key: object
     try:
         cert = x509.load_pem_x509_certificate(pem_bytes, default_backend())
         pub_key = cert.public_key()

@@ -39,10 +39,12 @@ def main() -> None:
 
     fingerprint = compute_public_key_fingerprint(public_key)
 
+    from typing import Literal
+
     device_id = "d-0a1b2c3d4e5f6071"
     seq = 42
     timestamp = 1760000000
-    msg_type = "tel"
+    msg_type: Literal["tel", "evt", "ack", "cmd"] = "tel"
     payload = {"temp_c": 24.7, "hum_pct": 51.2, "vbat_mv": 3980, "rssi": -61}
 
     envelope = sign_device_message(

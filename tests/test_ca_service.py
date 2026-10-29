@@ -1,6 +1,7 @@
 """Tests for snx-ca REST API service."""
 
 import pytest
+from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from starlette.testclient import TestClient
 
@@ -46,9 +47,9 @@ def test_ca_issue_from_csr(client: TestClient) -> None:
     assert data["serial_hex"]
 
     cert = load_certificate(data["certificate_pem"].encode("utf-8"))
-    assert cert.subject.get_attributes_for_oid(
-        from_oid=cert.subject.rdns[2].rfc4514_string().split("=")[0]
-    )  # valid cert
+    cns = cert.subject.get_attributes_for_oid(x509.oid.NameOID.COMMON_NAME)
+    assert len(cns) == 1
+    assert cns[0].value == "d-0011223344556677"
 
 
 def test_ca_fingerprint_endpoint(client: TestClient) -> None:

@@ -184,7 +184,9 @@ def create_intermediate_ca(
             critical=False,
         )
         .add_extension(
-            x509.AuthorityKeyIdentifier.from_issuer_public_key(root_cert.public_key()),
+            x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                root_cert.public_key()  # type: ignore[arg-type]
+            ),
             critical=False,
         )
         .sign(root_key, hashes.SHA256(), default_backend())
@@ -258,7 +260,9 @@ def issue_leaf_certificate(
             critical=False,
         )
         .add_extension(
-            x509.AuthorityKeyIdentifier.from_issuer_public_key(ca_cert.public_key()),
+            x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                ca_cert.public_key()  # type: ignore[arg-type]
+            ),
             critical=False,
         )
     )

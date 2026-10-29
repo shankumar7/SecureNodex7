@@ -33,14 +33,14 @@ contracts-test:
 
 pki-init:
 	@echo "Initializing PKI (Root & Intermediate CA, Broker certs)..."
-	@python3 pki/init_pki.py
+	@PYTHONPATH=. python3 pki/init_pki.py
 
 provision:
 	@if [ -z "$(LABEL)" ]; then \
 		echo "Usage: make provision LABEL=<device_label> [HOURS=<hours>]"; \
 		exit 1; \
 	fi
-	@python3 pki/provision-device.py --label "$(LABEL)"
+	@PYTHONPATH=. python3 pki/provision-device.py --label "$(LABEL)"
 
 chain-up:
 	@echo "Starting Besu / Hardhat local chain..."
