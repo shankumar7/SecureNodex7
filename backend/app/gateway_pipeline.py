@@ -5,14 +5,12 @@ import logging
 import time
 from typing import Any
 
-from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.db.models import Device
-from backend.app.message_core import b64url_decode, verify_device_message
-from pki.ca_core import compute_public_key_fingerprint
+from backend.app.message_core import verify_device_message
 
 logger = logging.getLogger("snx.gateway.pipeline")
 
@@ -51,9 +49,11 @@ class GatewayPipeline:
             return "NOT_FOUND", None, None
 
         pub_key = None
+        dev_status = str(device.status)
+        dev_fp = str(device.spki_fingerprint) if device.spki_fingerprint else None
         # In a real environment, cert or public key is loaded from local cert store or CA
-        self.device_cache[device_id] = (device.status, device.spki_fingerprint, pub_key, now)
-        return device.status, device.spki_fingerprint, pub_key
+        self.device_cache[device_id] = (dev_status, dev_fp, pub_key, now)
+        return dev_status, dev_fp, pub_key
 
     def check_rate_limit(self, device_id: str, max_rate: int = 5) -> bool:
         """Sliding window per-device rate limiter (default 5 msg/s)."""
@@ -76,6 +76,7 @@ class GatewayPipeline:
         client_cert_cn: str | None = None,
         public_key_override: ec.EllipticCurvePublicKey | None = None,
         now_override: int | None = None,
+        allow_queued: bool = False,
     ) -> tuple[bool, dict[str, Any] | None, str | None]:
         """Run full 8-step verification pipeline in strict order.
 
@@ -105,7 +106,6 @@ class GatewayPipeline:
         device_id = str(envelope["d"])
         seq = int(envelope["s"])
         timestamp = int(envelope["t"])
-        msg_type = str(envelope["y"])
 
         # Step 2: d equals topic device ID and equals authenticated client cert CN
         # Topic format: snx/v1/dev/<device_id>/<type>
@@ -124,13 +124,10 @@ class GatewayPipeline:
 
         # Step 4: Timestamp window: |now - t| <= 300 s
         now_ts = now_override if now_override is not None else int(time.time())
-        if abs(now_ts - timestamp) > self.window_s:
-            # Check if valid queued message: t <= now + 60
-            if timestamp > now_ts + 60:
-                return False, envelope, "TIMESTAMP_OUT_OF_WINDOW"
-            # If older than 300s, must have strictly increasing seq to be accepted
-            if seq <= self.last_seq.get(device_id, -1):
-                return False, envelope, "TIMESTAMP_OUT_OF_WINDOW"
+        if timestamp > now_ts + 60:
+            return False, envelope, "TIMESTAMP_OUT_OF_WINDOW"
+        if abs(now_ts - timestamp) > self.window_s and not allow_queued:
+            return False, envelope, "TIMESTAMP_OUT_OF_WINDOW"
 
         # Step 5: Replay check: s > last_seq[d]
         current_last_seq = self.last_seq.get(device_id, -1)
@@ -143,7 +140,7 @@ class GatewayPipeline:
             # Allow verification if public_key_override is provided; otherwise reject
             return False, envelope, "SIGNATURE_INVALID"
 
-        is_sig_valid = verify_device_message(public_key, envelope)
+        is_sig_valid = verify_device_message(pub_key, envelope)
         if not is_sig_valid:
             return False, envelope, "SIGNATURE_INVALID"
 

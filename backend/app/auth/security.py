@@ -1,14 +1,14 @@
 """Security utilities for ES256 JWT, Argon2id passwords, and token hashing."""
 
-from datetime import datetime, timedelta, timezone
 import hashlib
 import os
 import secrets
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
+import jwt
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
-import jwt
 from passlib.context import CryptContext
 
 from backend.app.config import settings
@@ -83,10 +83,7 @@ def create_access_token(
     """Generate an ES256-signed JWT access token."""
     private_key, _ = get_jwt_keys()
     now = datetime.now(timezone.utc)
-    if expires_delta:
-        expire = now + expires_delta
-    else:
-        expire = now + timedelta(minutes=15)
+    expire = now + expires_delta if expires_delta else now + timedelta(minutes=15)
 
     payload = {
         "sub": principal_id,

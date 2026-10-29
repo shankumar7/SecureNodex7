@@ -1,6 +1,7 @@
 """Objects API integration tests: upload, placement, range download, share, verify, tombstone."""
 
 import io
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession

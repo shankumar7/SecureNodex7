@@ -4,7 +4,12 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.auth.rbac import CurrentPrincipal, get_current_principal, mask_to_role_names, require
+from backend.app.auth.rbac import (
+    CurrentPrincipal,
+    get_current_principal,
+    mask_to_role_names,
+    require,
+)
 from backend.app.db.models import Principal
 from backend.app.db.session import get_db
 from backend.app.routers.schemas import (

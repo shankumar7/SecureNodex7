@@ -1,8 +1,8 @@
 """Audit log querying and hash chain cryptographic verification endpoints."""
 
 import json
-from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -84,19 +84,4 @@ async def verify_audit_log(
     )
 
 
-@router.get("/batches")
-async def list_batches(
-    current_user: CurrentPrincipal = Depends(require("audit:read")),
-) -> dict[str, Any]:
-    """List anchored batches."""
-    return {"batches": []}
 
-
-@router.get("/batches/{batch_id}/proof/{seq}")
-async def get_batch_proof(
-    batch_id: str,
-    seq: int,
-    current_user: CurrentPrincipal = Depends(require("audit:read")),
-) -> dict[str, Any]:
-    """Retrieve Merkle inclusion proof for a sequence inside a batch."""
-    return {"batch_id": batch_id, "seq": seq, "proof": []}

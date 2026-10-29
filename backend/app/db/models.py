@@ -1,8 +1,7 @@
 """SQLAlchemy database models for SecureNodeX."""
 
-from datetime import datetime, timezone
 import uuid
-from typing import Any
+from datetime import datetime, timezone
 
 from sqlalchemy import (
     BigInteger,

@@ -114,10 +114,7 @@ def is_permission_allowed(permission: str, role_mask: int, is_own_resource: bool
         return True
 
     # Check scoped permission (O)
-    if is_own_resource and (role_mask & scoped_allowed):
-        return True
-
-    return False
+    return bool(is_own_resource and (role_mask & scoped_allowed))
 
 
 @dataclass
@@ -156,12 +153,12 @@ async def get_current_principal(
     token = authorization.split(" ", 1)[1].strip()
     try:
         payload = decode_access_token(token)
-    except InvalidTokenError:
+    except InvalidTokenError as err:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired access token",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from err
 
     principal_id = payload.get("sub")
     if not principal_id:

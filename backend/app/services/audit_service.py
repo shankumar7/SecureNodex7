@@ -1,10 +1,11 @@
 """Audit service for recording on-chain/DB audit events and verifying the cryptographic hash chain."""
 
+import contextlib
 import json
 import logging
 import time
-from typing import Any
 import uuid
+from typing import Any
 
 import eth_abi
 from sqlalchemy import select
@@ -162,10 +163,8 @@ class AuditService:
 
         on_chain_head = None
         if chain_client.is_connected() and "AuditLog" in chain_client.contracts:
-            try:
+            with contextlib.suppress(Exception):
                 on_chain_head = chain_client.get_audit_head()
-            except Exception:
-                pass
 
         return {
             "valid": True,

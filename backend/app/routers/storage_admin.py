@@ -2,9 +2,10 @@
 
 from datetime import datetime, timezone
 from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.auth.rbac import CurrentPrincipal, require
@@ -12,7 +13,6 @@ from backend.app.chain.client import chain_client
 from backend.app.config import settings
 from backend.app.db.models import ChunkReplica, StorageNode, StoredChunk
 from backend.app.db.session import get_db
-from backend.app.services.audit_service import audit_service
 
 router = APIRouter(prefix="/v1", tags=["Storage Administration"])
 

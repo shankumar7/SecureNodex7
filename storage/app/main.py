@@ -4,19 +4,28 @@ mTLS-protected content-addressed chunk store with atomic writes, sharded directo
 streaming I/O, peer-to-peer replication, inventory pagination, and Prometheus metrics.
 """
 
-from contextlib import asynccontextmanager
-from datetime import datetime, timezone
 import hashlib
 import json
 import logging
 import os
-import shutil
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from typing import Any, AsyncIterator
+
 import httpx
-from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Query, Request, Response, status
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi import (
+    FastAPI,
+    Header,
+    HTTPException,
+    Query,
+    Request,
+    Response,
+    status,
+)
+from fastapi.responses import FileResponse
+from prometheus_client import CONTENT_TYPE_LATEST, REGISTRY, Counter, Gauge, generate_latest
 from pydantic import BaseModel, Field
-from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, REGISTRY, generate_latest
+
 from storage.app.config import storage_settings
 
 logging.basicConfig(level=logging.INFO)
@@ -313,7 +322,7 @@ async def replicate_chunk(req: ReplicateRequest) -> dict[str, Any]:
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Replication failed: {e}")
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Replication failed: {e}") from e
 
 
 @app.get("/v1/inventory", response_model=InventoryResponse)

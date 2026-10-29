@@ -1,16 +1,15 @@
 """Self-healing repair, heartbeat monitoring, and background maintenance worker."""
 
 import asyncio
-from datetime import datetime, timezone
 import logging
-from typing import Any
+from datetime import datetime, timezone
+
 import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.config import settings
 from backend.app.db.models import ChunkReplica, StorageNode, StoredChunk
-from backend.app.db.session import AsyncSessionLocal
 from backend.app.services.audit_service import audit_service
 from backend.app.storage.placement import StorageNodeInfo, rank_all_nodes
 

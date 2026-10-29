@@ -5,11 +5,9 @@ from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from web3 import Web3
 
 from backend.app.chain.client import chain_client
 from backend.app.db.models import AuditEvent, ChainSyncState, Device, Principal
-from backend.app.db.session import AsyncSessionLocal
 
 logger = logging.getLogger("snx.indexer")
 

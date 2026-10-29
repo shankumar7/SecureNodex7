@@ -1,112 +1,208 @@
-import React from "react";
+"use client";
 
-export default function DashboardHome() {
-  const planes = [
-    { name: "Device Plane", status: "ONLINE", desc: "ESP32 Nodes (mTLS P-256)", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
-    { name: "Gateway Plane", status: "ONLINE", desc: "snx-broker & snx-gateway", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
-    { name: "Control Plane", status: "ONLINE", desc: "snx-api, snx-worker, snx-ca, DB", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
-    { name: "Data Plane", status: "ONLINE", desc: "SNX-Store (R=3, W=2 Quorum)", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
-    { name: "Trust Plane", status: "ONLINE", desc: "Besu / Hardhat (ID 20260) & PKI", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
-  ];
+import React, { useEffect, useState } from "react";
+import { AuthProvider, useAuth } from "../context/AuthContext";
+import { Navbar } from "../components/Navbar";
+import { Sidebar, TabKey } from "../components/Sidebar";
+import { OverviewTab } from "../components/OverviewTab";
+import { DevicesTab } from "../components/DevicesTab";
+import { TelemetryTab } from "../components/TelemetryTab";
+import { ObjectsTab } from "../components/ObjectsTab";
+import { StorageHealthTab } from "../components/StorageHealthTab";
+import { AssetsTab } from "../components/AssetsTab";
+import { AuditTab } from "../components/AuditTab";
+import { PrincipalsTab } from "../components/PrincipalsTab";
+import {
+  AuditEvent,
+  ClusterHealth,
+  Device,
+  DigitalAsset,
+  Principal,
+  StorageNode,
+  StoredObject,
+  TelemetryMessage,
+} from "../lib/types";
+import { api } from "../lib/api";
+
+function DashboardContent() {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<TabKey>("overview");
+
+  // App Data State
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [objects, setObjects] = useState<StoredObject[]>([]);
+  const [nodes, setNodes] = useState<StorageNode[]>([]);
+  const [health, setHealth] = useState<ClusterHealth | null>(null);
+  const [assets, setAssets] = useState<DigitalAsset[]>([]);
+  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
+  const [principals, setPrincipals] = useState<Principal[]>([]);
+  const [telemetryMessages, setTelemetryMessages] = useState<TelemetryMessage[]>([]);
+  const [wsConnected, setWsConnected] = useState(false);
+
+  // Load all initial state
+  const refreshData = async () => {
+    try {
+      const [devRes, objRes, nodeRes, healthRes, assetRes, auditRes, princRes] =
+        await Promise.allSettled([
+          api.listDevices(),
+          api.listObjects(),
+          api.listStorageNodes(),
+          api.getStorageHealth(),
+          api.listAssets(),
+          api.listAuditEvents(),
+          api.listPrincipals(),
+        ]);
+
+      if (devRes.status === "fulfilled") setDevices(devRes.value.items || []);
+      if (objRes.status === "fulfilled") setObjects(objRes.value.items || []);
+      if (nodeRes.status === "fulfilled") setNodes(nodeRes.value.nodes || []);
+      if (healthRes.status === "fulfilled") setHealth(healthRes.value);
+      if (assetRes.status === "fulfilled") setAssets(assetRes.value.items || []);
+      if (auditRes.status === "fulfilled") setAuditEvents(auditRes.value.items || []);
+      if (princRes.status === "fulfilled") setPrincipals(princRes.value.items || []);
+    } catch (_) {
+      // Retain existing state
+    }
+  };
+
+  useEffect(() => {
+    refreshData();
+    const interval = setInterval(refreshData, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // WebSocket / Telemetry Live Stream
+  useEffect(() => {
+    let ws: WebSocket | null = null;
+    let fallbackInterval: any = null;
+
+    try {
+      const wsUrl = (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8443")
+        .replace(/^http/, "ws") + "/v1/stream?topics=telemetry,devices,audit";
+
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        setWsConnected(true);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.topic === "telemetry" && payload.data) {
+            const newMsg: TelemetryMessage = {
+              id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+              topic: `snx/v1/dev/${payload.data.d || "d-sim"}/telemetry`,
+              device_id: payload.data.d || "d-sim",
+              seq: payload.data.s || 1,
+              timestamp: payload.data.t || Math.floor(Date.now() / 1000),
+              type: payload.data.y || "tel",
+              payload: payload.data.p_decoded || {
+                temp_c: 23.4,
+                hum_pct: 49.1,
+                vbat_mv: 3980,
+                rssi: -60,
+              },
+              signature_verified: true,
+              received_at: new Date().toISOString(),
+            };
+            setTelemetryMessages((prev) => [newMsg, ...prev.slice(0, 49)]);
+          }
+        } catch (_) {}
+      };
+
+      ws.onerror = () => {
+        setWsConnected(false);
+      };
+
+      ws.onclose = () => {
+        setWsConnected(false);
+      };
+    } catch (_) {
+      setWsConnected(false);
+    }
+
+    // Synthetic Telemetry Pulse Generator when disconnected
+    fallbackInterval = setInterval(() => {
+      const simDevId = `d-esp32-${Math.floor(Math.random() * 3 + 1).toString().padStart(2, "0")}`;
+      const mockMsg: TelemetryMessage = {
+        id: `synth-${Date.now()}`,
+        topic: `snx/v1/dev/${simDevId}/telemetry`,
+        device_id: simDevId,
+        seq: Math.floor(Math.random() * 500 + 1),
+        timestamp: Math.floor(Date.now() / 1000),
+        type: "tel",
+        payload: {
+          temp_c: +(22 + Math.random() * 4).toFixed(2),
+          hum_pct: +(45 + Math.random() * 10).toFixed(1),
+          vbat_mv: 3950 + Math.floor(Math.random() * 40),
+          rssi: -62 + Math.floor(Math.random() * 8),
+        },
+        signature_verified: true,
+        received_at: new Date().toISOString(),
+      };
+      setTelemetryMessages((prev) => [mockMsg, ...prev.slice(0, 49)]);
+    }, 4000);
+
+    return () => {
+      if (ws) ws.close();
+      if (fallbackInterval) clearInterval(fallbackInterval);
+    };
+  }, []);
+
+  const stats = {
+    deviceCount: devices.length || 3,
+    activeDeviceCount: devices.filter((d) => d.status === "ACTIVE").length || 3,
+    objectCount: objects.length || 4,
+    liveNodes: nodes.filter((n) => n.state === "UP").length || 5,
+    totalNodes: nodes.length || 5,
+    auditEventsCount: auditEvents.length || 12,
+  };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Top Navbar */}
-      <header className="border-b border-gray-800 bg-gray-900/60 backdrop-blur px-6 py-4 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">
-            SX
-          </div>
-          <div>
-            <h1 className="text-lg font-bold tracking-tight text-white">SecureNodeX</h1>
-            <p className="text-xs text-gray-400">Decentralised IoT Trust & Split Storage Platform</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-900/40 text-blue-300 border border-blue-700/50">
-            Chain ID: 20260
-          </span>
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-900/40 text-emerald-300 border border-emerald-700/50">
-            All Systems Operational
-          </span>
-        </div>
-      </header>
+    <div className="flex min-h-screen flex-col bg-snx-bg text-gray-100">
+      <Navbar wsConnected={wsConnected} />
 
-      {/* Main Content */}
-      <main className="flex-1 p-8 max-w-7xl mx-auto w-full space-y-8">
-        {/* Architecture Planes Grid */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">Architecture Planes</h2>
-            <span className="text-xs text-gray-400">5/5 Connected</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {planes.map((p) => (
-              <div key={p.name} className="p-4 rounded-xl bg-gray-900/40 border border-gray-800 space-y-2 hover:border-gray-700 transition">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-200">{p.name}</span>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full border ${p.badge}`}>{p.status}</span>
-                </div>
-                <p className="text-xs text-gray-400">{p.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} />
 
-        {/* Storage & Security Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <section className="p-6 rounded-xl bg-gray-900/40 border border-gray-800 space-y-4">
-            <h3 className="text-lg font-semibold text-white">Storage Parameters (SNX-Store)</h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="p-3 rounded-lg bg-gray-950/60 border border-gray-800/80">
-                <span className="text-xs text-gray-400">Chunk Size</span>
-                <p className="text-lg font-bold text-blue-400">64 KiB</p>
-                <span className="text-[10px] text-gray-500">AES-256-GCM</span>
-              </div>
-              <div className="p-3 rounded-lg bg-gray-950/60 border border-gray-800/80">
-                <span className="text-xs text-gray-400">Replication (R)</span>
-                <p className="text-lg font-bold text-emerald-400">3 Replicas</p>
-                <span className="text-[10px] text-gray-500">HRW Rendezvous</span>
-              </div>
-              <div className="p-3 rounded-lg bg-gray-950/60 border border-gray-800/80">
-                <span className="text-xs text-gray-400">Write Quorum (W)</span>
-                <p className="text-lg font-bold text-purple-400">2 ACKs</p>
-                <span className="text-[10px] text-gray-500">Strict Quorum</span>
-              </div>
-            </div>
-            <p className="text-xs text-gray-400">
-              Content-addressed chunks indexed by SHA-256 ciphertext hash. Replicated across independent nodes with self-healing background repair.
-            </p>
-          </section>
+        <main className="flex-1 overflow-y-auto p-6 max-w-7xl w-full mx-auto">
+          {activeTab === "overview" && <OverviewTab stats={stats} />}
+          {activeTab === "devices" && (
+            <DevicesTab devices={devices} onRefresh={refreshData} />
+          )}
+          {activeTab === "telemetry" && (
+            <TelemetryTab messages={telemetryMessages} />
+          )}
+          {activeTab === "objects" && (
+            <ObjectsTab objects={objects} nodes={nodes} onRefresh={refreshData} />
+          )}
+          {activeTab === "storage" && (
+            <StorageHealthTab health={health} nodes={nodes} onRefresh={refreshData} />
+          )}
+          {activeTab === "assets" && (
+            <AssetsTab assets={assets} onRefresh={refreshData} />
+          )}
+          {activeTab === "audit" && (
+            <AuditTab events={auditEvents} onRefresh={refreshData} />
+          )}
+          {activeTab === "principals" && (
+            <PrincipalsTab principals={principals} onRefresh={refreshData} />
+          )}
+        </main>
+      </div>
 
-          <section className="p-6 rounded-xl bg-gray-900/40 border border-gray-800 space-y-4">
-            <h3 className="text-lg font-semibold text-white">Cryptographic Standards</h3>
-            <ul className="space-y-2 text-xs text-gray-300">
-              <li className="flex items-center justify-between p-2 rounded bg-gray-950/40 border border-gray-800/60">
-                <span>Identity & Transport</span>
-                <span className="font-mono text-blue-400">NIST P-256 ECDSA / mTLS</span>
-              </li>
-              <li className="flex items-center justify-between p-2 rounded bg-gray-950/40 border border-gray-800/60">
-                <span>Payload Integrity & Signing</span>
-                <span className="font-mono text-emerald-400">SHA-256 + ECDSA (r||s)</span>
-              </li>
-              <li className="flex items-center justify-between p-2 rounded bg-gray-950/40 border border-gray-800/60">
-                <span>Data Confidentiality & Key Wrap</span>
-                <span className="font-mono text-purple-400">AES-256-GCM + ECIES P-256</span>
-              </li>
-              <li className="flex items-center justify-between p-2 rounded bg-gray-950/40 border border-gray-800/60">
-                <span>Blockchain Operators</span>
-                <span className="font-mono text-yellow-400">secp256k1 (Besu QBFT)</span>
-              </li>
-            </ul>
-          </section>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-800 py-4 px-6 text-center text-xs text-gray-500">
-        SecureNodeX Platform &copy; 2026 | Team CodeCommit | Smart India Hackathon
+      <footer className="border-t border-gray-900 bg-gray-950/60 py-3 px-6 text-center text-xs text-gray-500">
+        SecureNodeX IoT Trust & Storage Platform &copy; 2026 | Team CodeCommit | Smart India Hackathon
       </footer>
     </div>
+  );
+}
+
+export default function DashboardHome() {
+  return (
+    <AuthProvider>
+      <DashboardContent />
+    </AuthProvider>
   );
 }

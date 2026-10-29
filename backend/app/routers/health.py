@@ -1,13 +1,9 @@
 """Health checks and metrics endpoints."""
 
 from typing import Any
-from fastapi import APIRouter, Depends, Response
-from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.chain.client import chain_client
-from backend.app.db.session import get_db
+from fastapi import APIRouter, Response
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 router = APIRouter(tags=["Health"])
 

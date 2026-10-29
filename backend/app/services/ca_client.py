@@ -2,12 +2,12 @@
 
 import logging
 from typing import Any
+
 import httpx
 
 from backend.app.config import settings
 from pki.ca_core import (
     compute_public_key_fingerprint,
-    generate_p256_private_key,
     issue_leaf_certificate,
     load_certificate,
     load_private_key,
@@ -44,10 +44,11 @@ class CAClient:
         return self._issue_in_process(csr_pem, principal_id, "device")
 
     def _issue_in_process(self, csr_pem: str, principal_id: str, kind: str) -> dict[str, Any]:
+        import os
+
         from cryptography import x509
         from cryptography.hazmat.backends import default_backend
         from cryptography.hazmat.primitives import serialization
-        import os
 
         ca_key_path = "pki/keys/intermediate_ca.key"
         ca_cert_path = "pki/certs/intermediate_ca.crt"

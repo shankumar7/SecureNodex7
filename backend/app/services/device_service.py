@@ -1,13 +1,11 @@
 """Device lifecycle, PKI provisioning (Mode A/B), and certificate rotation."""
 
-from datetime import datetime, timedelta, timezone
 import json
 import logging
 import secrets
+from datetime import datetime, timedelta, timezone
 from typing import Any
-import uuid
 
-from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -18,7 +16,7 @@ from backend.app.chain.client import chain_client
 from backend.app.db.models import Device
 from backend.app.services.audit_service import audit_service
 from backend.app.services.ca_client import ca_client
-from pki.ca_core import compute_public_key_fingerprint, create_csr, generate_p256_private_key
+from pki.ca_core import create_csr, generate_p256_private_key
 
 logger = logging.getLogger("snx.devices")
 

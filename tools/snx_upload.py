@@ -7,6 +7,7 @@ Uploads a file to SecureNodeX decentralized storage and displays an ASCII placem
 import argparse
 import os
 import sys
+
 import httpx
 from tabulate import tabulate
 

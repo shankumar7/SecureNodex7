@@ -1,9 +1,7 @@
 """AES-256-GCM chunk encryption and ECIES (P-256 + HKDF + AES-GCM) key wrapping."""
 
 import base64
-import os
 import secrets
-from typing import Any
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization

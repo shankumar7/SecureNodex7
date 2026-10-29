@@ -2,7 +2,6 @@
 
 import logging
 import uuid
-from typing import Any
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select

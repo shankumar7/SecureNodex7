@@ -1,9 +1,20 @@
 """Objects API: multipart upload, streaming decrypted download with Range support, sharing, and verification."""
 
-import json
+import contextlib
 from typing import Any
-from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, Response, UploadFile, status
-from fastapi.responses import StreamingResponse
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    Header,
+    HTTPException,
+    Query,
+    Response,
+    UploadFile,
+    status,
+)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -395,10 +406,8 @@ async def delete_object(
 
     # Tombstone on chain
     if chain_client.is_connected() and "DataRegistry" in chain_client.contracts:
-        try:
+        with contextlib.suppress(Exception):
             chain_client.tombstone_object(object_id)
-        except Exception:
-            pass
 
     await audit_service.record_event(
         db=db,

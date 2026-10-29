@@ -1,8 +1,8 @@
 """Table-driven test suite for RBAC permission matrix (docs/05_RBAC.md) and separation of duties."""
 
 import pytest
+
 from backend.app.auth.rbac import (
-    PERMISSION_MATRIX,
     RoleBit,
     is_permission_allowed,
     mask_to_role_names,

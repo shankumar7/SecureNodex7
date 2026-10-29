@@ -1,14 +1,14 @@
 """Unit tests for snx-storage node service (AT-13)."""
 
 import hashlib
-import os
 import shutil
 import tempfile
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 from storage.app.config import storage_settings
-from storage.app.main import StorageStore, app
+from storage.app.main import app
 
 
 @pytest.fixture

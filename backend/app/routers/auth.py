@@ -1,7 +1,8 @@
 """Authentication routes: login, refresh token rotation, logout, and current user profile."""
 
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

@@ -1,6 +1,5 @@
 """Web3 chain client with nonce management, retries, and contract interactions."""
 
-import asyncio
 import json
 import logging
 import os
@@ -11,7 +10,6 @@ from typing import Any
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
 from web3 import Web3
-from web3.exceptions import TransactionNotFound
 
 from backend.app.config import settings
 

@@ -2,15 +2,16 @@
 
 import json
 from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.auth.rbac import CurrentPrincipal, require
 from backend.app.db.models import BatchRecord
 from backend.app.db.session import get_db
-from backend.app.gateway.batcher import (
+from backend.app.gateway_batcher import (
     compute_batch_inclusion_proof,
     verify_batch_inclusion_proof,
 )

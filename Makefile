@@ -51,8 +51,8 @@ storage-up:
 	@NODE_ID=$(NODE_ID) docker compose -f deploy/docker-compose.storage.yml up -d 2>/dev/null || echo "Remote storage compose ready for M8"
 
 simulate:
-	@echo "Running simulator with $(DEVICES) virtual devices..."
-	@python3 -c "print('Simulator ready for M6')"
+	@echo "Running simulator with $(or $(DEVICES),100) virtual devices..."
+	@python3 -m simulator.main --devices $(or $(DEVICES),100) --rate $(or $(RATE),1.0) --duration $(or $(DURATION),5.0)
 
 demo:
 	@echo "Starting SecureNodeX Full Rehearsal..."

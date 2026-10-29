@@ -1,14 +1,15 @@
 """Storage Coordinator: streaming chunking, encryption, parallel quorum upload, and verified read path."""
 
 import asyncio
+import contextlib
 import hashlib
 import json
 import logging
-from typing import Any, AsyncIterator, Sequence
 import uuid
+from typing import Any, Sequence
 
-from cryptography.hazmat.primitives.asymmetric import ec
 import httpx
+from cryptography.hazmat.primitives.asymmetric import ec
 from fastapi import HTTPException, status
 
 from backend.app.config import settings
@@ -16,10 +17,9 @@ from backend.app.storage.crypto import (
     decrypt_chunk,
     encrypt_chunk,
     generate_dek,
-    unwrap_dek_ecies,
     wrap_dek_ecies,
 )
-from backend.app.storage.merkle import compute_merkle_root, verify_merkle_proof
+from backend.app.storage.merkle import compute_merkle_root
 from backend.app.storage.placement import (
     StorageNodeInfo,
     apply_diversity_rule,
@@ -72,10 +72,8 @@ class StorageCoordinator:
         chunk_id: str,
     ) -> None:
         url = f"{node.endpoint.rstrip('/')}/v1/chunks/{chunk_id}"
-        try:
+        with contextlib.suppress(Exception):
             await client.delete(url, timeout=3.0)
-        except Exception:
-            pass
 
     async def upload_object(
         self,
@@ -130,7 +128,7 @@ class StorageCoordinator:
         uploaded_map: dict[str, list[StorageNodeInfo]] = {}
         async with httpx.AsyncClient(verify=False) as client:
             for idx, (cid, ciphertext, target_nodes) in enumerate(
-                zip(chunk_ids, encrypted_chunks, final_placements)
+                zip(chunk_ids, encrypted_chunks, final_placements, strict=False)
             ):
                 all_ranked = rank_all_nodes(cid, live_nodes)
                 successful_nodes: list[StorageNodeInfo] = []
@@ -142,7 +140,7 @@ class StorageCoordinator:
                 ]
                 results = await asyncio.gather(*tasks, return_exceptions=True)
 
-                for n, res in zip(target_nodes, results):
+                for n, res in zip(target_nodes, results, strict=False):
                     if res is True:
                         successful_nodes.append(n)
 
@@ -240,7 +238,6 @@ class StorageCoordinator:
         if total_size == 0 or byte_start > byte_end:
             return b""
 
-        live_nodes_map = {n.id: n for n in nodes if n.state == "UP"}
         all_ranked_nodes = {c["id"]: rank_all_nodes(c["id"], nodes) for c in chunks_meta}
 
         full_plaintext = bytearray()

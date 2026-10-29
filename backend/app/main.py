@@ -1,8 +1,8 @@
 """SecureNodeX Core API (snx-api) FastAPI Application."""
 
-from contextlib import asynccontextmanager
 import logging
 import uuid
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, Response, status
@@ -11,10 +11,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from backend.app.config import settings
 from backend.app.db.base import Base
 from backend.app.db.session import async_engine
-from backend.app.routers import audit, auth, devices, health, principals
+from backend.app.routers import (
+    audit,
+    auth,
+    batches,
+    devices,
+    health,
+    objects,
+    principals,
+    storage_admin,
+    stream,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("snx-api")
@@ -105,18 +114,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         headers={"X-Correlation-Id": cid},
     )
 
-
-from backend.app.routers import (
-    audit,
-    auth,
-    batches,
-    devices,
-    health,
-    objects,
-    principals,
-    storage_admin,
-    stream,
-)
 
 # Include Routers
 app.include_router(health.router)

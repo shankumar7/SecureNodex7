@@ -5,11 +5,10 @@ import hashlib
 import json
 import logging
 import time
-from typing import Any, Sequence
 import uuid
+from typing import Any, Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from web3 import Web3
 
 from backend.app.chain.client import chain_client
 from backend.app.config import settings

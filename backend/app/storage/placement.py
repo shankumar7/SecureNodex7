@@ -1,7 +1,7 @@
 """Rendezvous (HRW) placement hashing and diversity rule enforcement (FR-STO-3)."""
 
-from dataclasses import dataclass
 import hashlib
+from dataclasses import dataclass
 from typing import Sequence
 
 
