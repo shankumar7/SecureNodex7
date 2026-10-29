@@ -70,7 +70,7 @@ If the jury asks: "Show me where ECC is used":
   * Runs: Dashboard UI (:3000), API Server (:8443), Primary Blockchain Node (:8545).
 
 - Raspberry Pi (Physical IoT Edge Storage Node):
-  * IP: 10.120.11.183
+  * IP: 172.31.6.75
   * Runs: snx-storage daemon on port 7443. Holds real chunks on its SD card.
 
 - Laptop 2, 3, 4 (Decentralized Storage Nodes + QBFT Validators):
@@ -100,7 +100,7 @@ If the jury asks: "Show me where ECC is used":
      laptop storage nodes marked "UP".
    - Say:
      "Notice that our storage cluster is not a mock; it includes a physical 
-      Raspberry Pi at 10.120.11.183 and multiple teammate laptops over our WiFi."
+      Raspberry Pi at 172.31.6.75 and multiple teammate laptops over our WiFi."
 
 --- STEP 2: LIVE FILE UPLOAD & MULTI-DEVICE SPLITTING ---
 1. In the "Decentralized Storage" tab, click "Upload Object".
@@ -114,7 +114,7 @@ If the jury asks: "Show me where ECC is used":
 
 --- STEP 3: PROVE THE CHUNKS PHYSICALLY REACHED THE RASPBERRY PI ---
 1. Open your terminal connected to the Raspberry Pi:
-     ssh shankumar@10.120.11.183
+     ssh shankumar@172.31.6.75
 2. Run:
      ls -la ~/storage_data
 3. Show the jury:
