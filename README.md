@@ -241,5 +241,5 @@ npm run dev
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ```text
-Copyright (c) 2026 Shashank Kumar, D Rithwik, Ezaz Ali, Dheeraj Pusuluri, Dinesh Kumar, Shruthi Peddapuram
+Copyright (c) 2026 Shan Kumar
 ```
