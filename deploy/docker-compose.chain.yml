@@ -5,13 +5,13 @@ version: "3.8"
 services:
   besu-node:
     image: hyperledger/besu:24.7.0
-    container_name: snx-besu-${NODE_NAME:-validator1}
+    container_name: snx-besu-${NODE_NAME:-validator${VALIDATOR_ID:-1}}
     restart: unless-stopped
     environment:
       - BESU_LOGGING=INFO
     volumes:
       - ../chain/genesis.json:/opt/besu/genesis.json:ro
-      - ../chain/keys/${NODE_NAME:-validator1}/key:/opt/besu/key:ro
+      - ../chain/keys/${NODE_NAME:-validator${VALIDATOR_ID:-1}}/key:/opt/besu/key:ro
       - ../chain/static-nodes.json:/opt/besu/static-nodes.json:ro
       - besu_data:/opt/besu/data
     ports:
