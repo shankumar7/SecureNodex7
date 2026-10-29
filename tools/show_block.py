@@ -5,7 +5,9 @@ import json
 import urllib.request
 from datetime import datetime
 
-RPC_URL = "http://localhost:8545"
+import os
+
+RPC_URL = os.environ.get("RPC_URL", "http://localhost:8545")
 
 # Load deployed contract names
 try:
