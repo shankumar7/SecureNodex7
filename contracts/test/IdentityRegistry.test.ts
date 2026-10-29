@@ -40,17 +40,17 @@ describe("IdentityRegistry Contract", function () {
     expect(ident.status).to.equal(0); // ACTIVE
     expect(await identityRegistry.activeAdminCount()).to.equal(1);
     expect(await identityRegistry.isActive(adminId)).to.be.true;
-    expect(await identityRegistry.hasRole(adminId, ROLE_ADMIN)).to.be.true;
+    expect(await identityRegistry.getFunction("hasRole(bytes32,uint32)")(adminId, ROLE_ADMIN)).to.be.true;
   });
 
   it("should allow Admin to register Manager, Device, and User", async function () {
     // Admin registers Manager
     await identityRegistry.register(managerId, 0, ROLE_MANAGER, fp1, meta, adminId);
-    expect(await identityRegistry.hasRole(managerId, ROLE_MANAGER)).to.be.true;
+    expect(await identityRegistry.getFunction("hasRole(bytes32,uint32)")(managerId, ROLE_MANAGER)).to.be.true;
 
     // Manager registers Device
     await identityRegistry.register(devId, 1, ROLE_DEVICE, fp1, meta, managerId);
-    expect(await identityRegistry.hasRole(devId, ROLE_DEVICE)).to.be.true;
+    expect(await identityRegistry.getFunction("hasRole(bytes32,uint32)")(devId, ROLE_DEVICE)).to.be.true;
 
     // Non-Admin cannot register User
     await expect(
