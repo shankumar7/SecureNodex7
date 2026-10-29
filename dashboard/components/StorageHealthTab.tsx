@@ -280,11 +280,10 @@ export const StorageHealthTab: React.FC<StorageHealthTabProps> = ({ health, node
                     </div>
                   </div>
                   <span
-                    className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono-snx font-bold ${
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono-snx font-bold ${
                       isUp ? "badge-emerald" : "badge-ghost"
                     }`}
                   >
-                    <span className={`h-1.5 w-1.5 rounded-full ${isUp ? "bg-emerald-400 pulse-beacon" : "bg-slate-400"}`} />
                     <span>{node.state}</span>
                   </span>
                 </div>

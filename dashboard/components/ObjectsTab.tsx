@@ -326,14 +326,8 @@ export const ObjectsTab: React.FC<ObjectsTabProps> = ({ objects, nodes, onRefres
                 </div>
 
                 <div className="flex items-center space-x-4 text-[11px] font-mono-snx text-snx-muted p-3 rounded-xl glass-2 border border-[var(--border-glass-subtle)]">
-                  <span className="flex items-center space-x-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                    <span className="text-snx-secondary font-semibold">Primary Replica</span>
-                  </span>
-                  <span className="flex items-center space-x-1.5">
-                    <span className="h-2 w-2 rounded-full bg-cyan-400" />
-                    <span className="text-snx-secondary font-semibold">Secondary Replica</span>
-                  </span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Primary Replica</span>
+                  <span className="text-cyan-600 dark:text-cyan-400 font-semibold">Secondary Replica</span>
                 </div>
               </div>
             ) : null}

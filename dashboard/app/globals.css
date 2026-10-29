@@ -480,10 +480,6 @@
 /* ─────────────────────────────────────────────────────────────
    ANIMATIONS
    ───────────────────────────────────────────────────────────── */
-.pulse-beacon {
-  /* Clean, crisp static indicator - no fuzzy glow halo */
-  opacity: 1;
-}
 
 @keyframes slideFadeIn {
   from {

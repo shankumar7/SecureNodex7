@@ -158,10 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab }) => {
 
       {/* Minimal Footer Status Row (Replacing bulky card) */}
       <div className="p-3 border-t border-slate-200/70 dark:border-white/[0.08] flex items-center justify-between text-[11px] font-mono-snx text-slate-500 dark:text-slate-400">
-        <span className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          <span>Mesh Active</span>
-        </span>
+        <span>Mesh Active</span>
         <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 font-medium">
           4 Nodes
         </span>

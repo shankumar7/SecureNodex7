@@ -69,18 +69,10 @@ export const Navbar: React.FC<NavbarProps> = ({ wsConnected }) => {
 
         {/* Center: Sleek Telemetry Status (No chunky bubbles) */}
         <div className="hidden lg:flex items-center space-x-3 text-[11px] font-mono-snx text-slate-600 dark:text-slate-400">
-          <span className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            <span>Chain 20260 (QBFT)</span>
-          </span>
+          <span>Chain 20260 (QBFT)</span>
           <span className="text-slate-300 dark:text-slate-700">·</span>
-          <span className="flex items-center gap-1.5">
-            <span
-              className={`h-1.5 w-1.5 rounded-full ${
-                wsConnected ? "bg-emerald-500" : "bg-amber-500"
-              }`}
-            />
-            <span>{wsConnected ? "mTLS active" : "mTLS connecting"}</span>
+          <span className={wsConnected ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-amber-600 dark:text-amber-400"}>
+            {wsConnected ? "mTLS active" : "mTLS connecting"}
           </span>
           <span className="text-slate-300 dark:text-slate-700">·</span>
           <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300 font-medium">
@@ -102,7 +94,6 @@ export const Navbar: React.FC<NavbarProps> = ({ wsConnected }) => {
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 transition"
               title="Switch role"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
               <span>{currentPreset?.label || currentRole}</span>
               <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>

@@ -263,7 +263,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
               Cluster Overview & Telemetry
             </h1>
             <div className="pill-live">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               Operational
             </div>
           </div>
@@ -406,18 +405,13 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
                 key={node.name}
                 className={`p-4 rounded-2xl glass-2 border transition-all duration-200 relative group ${
                   node.isCommander
-                    ? "border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] bg-emerald-500/[0.04]"
+                    ? "border-indigo-500/40 bg-indigo-50/50 dark:bg-white/[0.04]"
                     : "border-[var(--border-glass-subtle)] hover:border-[var(--border-glass)]"
                 }`}
               >
                 {/* Node Title & Status Badge */}
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span
-                      className={`h-2 w-2 rounded-full ${
-                        node.isCommander ? "bg-emerald-500" : "bg-slate-400/60"
-                      }`}
-                    />
                     <span className="font-bold text-xs text-snx-primary font-mono-snx">
                       {node.name}
                     </span>
@@ -470,11 +464,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
               >
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2.5 flex-wrap">
-                    <span
-                      className={`h-2 w-2 rounded-full flex-shrink-0 ${
-                        p.healthy ? "bg-emerald-500" : "bg-amber-500"
-                      }`}
-                    />
                     <span className="font-bold text-xs text-snx-primary">{p.name}</span>
                     <span
                       className={`text-[9px] font-mono-snx px-2 py-0.5 rounded-full ${
@@ -507,13 +496,12 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
               <Zap className="w-3.5 h-3.5 text-amber-500" />
               <h3 className="sec-label">LIVE AUDIT STREAM</h3>
             </div>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           </div>
 
           <div className="snx-card p-4 space-y-3 relative overflow-hidden">
             <p className="font-mono-snx text-[10px] text-snx-muted border-b border-[var(--border-glass-subtle)] pb-2 flex items-center justify-between">
               <span>Zero-trust mTLS & Merkle events</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">● live</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider text-[9px]">live</span>
             </p>
 
             <div className="space-y-2.5">

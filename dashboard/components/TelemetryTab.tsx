@@ -63,7 +63,6 @@ export const TelemetryTab: React.FC<TelemetryTabProps> = ({ messages }) => {
           </p>
         </div>
         <div className="pill-live self-start sm:self-auto">
-          <span className="h-2 w-2 rounded-full bg-emerald-400 pulse-beacon" />
           <span>QoS 1 Ingestion Active</span>
         </div>
       </div>
