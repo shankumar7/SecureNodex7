@@ -11,38 +11,33 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "dark",
+  theme: "light",
   toggleTheme: () => {},
   setTheme: () => {},
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem("snx-theme") as Theme | null;
-    if (saved === "light" || saved === "dark") {
-      setThemeState(saved);
-      document.documentElement.setAttribute("data-theme", saved);
-      if (saved === "dark") {
-        document.documentElement.classList.add("dark");
-        document.documentElement.classList.remove("light");
-      } else {
-        document.documentElement.classList.add("light");
-        document.documentElement.classList.remove("dark");
-      }
+    const saved = localStorage.getItem("snx-theme-mode") as Theme | null;
+    const effectiveTheme: Theme = saved === "dark" ? "dark" : "light";
+    setThemeState(effectiveTheme);
+    document.documentElement.setAttribute("data-theme", effectiveTheme);
+    if (effectiveTheme === "light") {
+      document.documentElement.classList.add("light");
+      document.documentElement.classList.remove("dark");
     } else {
-      // Default to dark glassmorphism
-      document.documentElement.setAttribute("data-theme", "dark");
       document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
     }
   }, []);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem("snx-theme", newTheme);
+    localStorage.setItem("snx-theme-mode", newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark");
@@ -54,7 +49,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
   return (

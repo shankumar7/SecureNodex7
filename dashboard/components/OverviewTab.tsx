@@ -118,9 +118,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       sub: "Client-side encrypted chunks",
       footKey: "Replication Factor:",
       footVal: "R=3 (Target met)",
-      icon: <HardDrive className="w-5 h-5 text-indigo-400" />,
-      cornerGlow: "from-indigo-500/20 via-violet-500/10 to-transparent",
-      accentColor: "text-indigo-400",
+      icon: <HardDrive className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />,
+      cornerGlow: "from-indigo-500/15 via-violet-500/5 to-transparent",
+      accentColor: "text-indigo-600 dark:text-indigo-400",
       cardHover: "snx-card-violet",
     },
     {
@@ -130,9 +130,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       sub: "Hardware identities enrolled",
       footKey: "Authentication:",
       footVal: "mTLS Verified",
-      icon: <Cpu className="w-5 h-5 text-cyan-400" />,
-      cornerGlow: "from-cyan-500/20 via-sky-500/10 to-transparent",
-      accentColor: "text-cyan-400",
+      icon: <Cpu className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />,
+      cornerGlow: "from-cyan-500/15 via-sky-500/5 to-transparent",
+      accentColor: "text-cyan-600 dark:text-cyan-400",
       cardHover: "snx-card-cyan",
     },
     {
@@ -142,9 +142,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       sub: "Write Quorum W=2 Verified",
       footKey: "Commander:",
       footVal: "10.87.198.70:7443",
-      icon: <Shield className="w-5 h-5 text-emerald-400" />,
-      cornerGlow: "from-emerald-500/20 via-teal-500/10 to-transparent",
-      accentColor: "text-emerald-400",
+      icon: <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />,
+      cornerGlow: "from-emerald-500/15 via-teal-500/5 to-transparent",
+      accentColor: "text-emerald-600 dark:text-emerald-400",
       cardHover: "snx-card-emerald",
     },
     {
@@ -154,9 +154,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       sub: "Rolling proofs anchored on EVM",
       footKey: "Consensus:",
       footVal: "QBFT (Chain 20260)",
-      icon: <ScrollText className="w-5 h-5 text-amber-400" />,
-      cornerGlow: "from-amber-500/20 via-orange-500/10 to-transparent",
-      accentColor: "text-amber-400",
+      icon: <ScrollText className="w-5 h-5 text-amber-600 dark:text-amber-400" />,
+      cornerGlow: "from-amber-500/15 via-orange-500/5 to-transparent",
+      accentColor: "text-amber-600 dark:text-amber-400",
       cardHover: "snx-card-amber",
     },
   ];
@@ -170,7 +170,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       tech: "X.509 CA · mTLS Enclave · SPKI Fingerprints",
       latency: "< 2ms",
       healthy: true,
-      accent: "text-indigo-400",
+      accent: "text-indigo-600 dark:text-indigo-400",
     },
     {
       name: "Gateway & Coordination Plane",
@@ -179,7 +179,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       tech: "100 msg / 30s Batching · Replay Protection",
       latency: "< 4ms",
       healthy: true,
-      accent: "text-violet-400",
+      accent: "text-violet-600 dark:text-violet-400",
     },
     {
       name: "Decentralized Storage (SNX)",
@@ -188,7 +188,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       tech: "AES-256-GCM Slicing · HRW Rendezvous Diversity",
       latency: "< 6ms",
       healthy: isDataPlaneHealthy,
-      accent: "text-cyan-400",
+      accent: "text-cyan-600 dark:text-cyan-400",
     },
     {
       name: "Immutable Trust Ledger",
@@ -197,7 +197,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       tech: "Hyperledger Besu QBFT · Chain ID 20260",
       latency: "< 1ms",
       healthy: true,
-      accent: "text-amber-400",
+      accent: "text-amber-600 dark:text-amber-400",
     },
     {
       name: "Self-Healing & Scrubbing Plane",
@@ -206,7 +206,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
       tech: "Auto-rereplicate · Drift Correction",
       latency: "8s",
       healthy: true,
-      accent: "text-emerald-400",
+      accent: "text-emerald-600 dark:text-emerald-400",
     },
   ];
 
@@ -263,7 +263,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
               Cluster Overview & Telemetry
             </h1>
             <div className="pill-live">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 pulse-beacon" />
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               Operational
             </div>
           </div>
@@ -274,9 +274,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
 
         <div className="flex items-center gap-2">
           <div className="px-3.5 py-1.5 rounded-xl glass-2 text-xs font-mono-snx text-snx-secondary flex items-center gap-2">
-            <Shield className="w-3.5 h-3.5 text-indigo-400" />
+            <Shield className="w-3.5 h-3.5 text-indigo-500" />
             <span>Quorum:</span>
-            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">
+            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-violet-600">
               N=4 · R=3 · W=2
             </span>
           </div>
@@ -298,7 +298,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
             {/* Header: Label + Glass Icon Tile */}
             <div className="flex items-start justify-between relative z-10">
               <span className="sec-label leading-tight">{c.label}</span>
-              <div className="h-9 w-9 rounded-xl glass-2 border border-[var(--border-glass)] flex items-center justify-center shadow-md">
+              <div className="h-9 w-9 rounded-xl glass-2 border border-[var(--border-glass)] flex items-center justify-center shadow-xs">
                 {c.icon}
               </div>
             </div>
@@ -338,7 +338,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--border-glass-subtle)] pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <Network className="w-4 h-4 text-indigo-400" />
+              <Network className="w-4 h-4 text-indigo-500" />
               <h3 className="text-sm font-bold text-snx-primary tracking-tight">
                 HARDWARE CLUSTER TOPOLOGY & PEER ENDPOINTS
               </h3>
@@ -359,9 +359,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="meshGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.8" />
-                  <stop offset="50%" stopColor="#6366F1" stopOpacity="0.6" />
-                  <stop offset="100%" stopColor="#38BDF8" stopOpacity="0.4" />
+                  <stop offset="0%" stopColor="#059669" stopOpacity="0.85" />
+                  <stop offset="50%" stopColor="#4F46E5" stopOpacity="0.75" />
+                  <stop offset="100%" stopColor="#0284C7" stopOpacity="0.65" />
                 </linearGradient>
               </defs>
               {/* Connecting line 1 -> 2 */}
@@ -371,7 +371,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
                 x2="37.5%"
                 y2="50%"
                 stroke="url(#meshGradient)"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 className="mesh-flow-line"
               />
               {/* Connecting line 1 -> 3 */}
@@ -381,8 +381,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
                 x2="62.5%"
                 y2="50%"
                 stroke="url(#meshGradient)"
-                strokeWidth="1.5"
-                strokeOpacity="0.5"
+                strokeWidth="2"
+                strokeOpacity="0.6"
                 className="mesh-flow-line"
               />
               {/* Connecting line 1 -> 4 */}
@@ -392,8 +392,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
                 x2="87.5%"
                 y2="50%"
                 stroke="url(#meshGradient)"
-                strokeWidth="1.5"
-                strokeOpacity="0.5"
+                strokeWidth="2"
+                strokeOpacity="0.6"
                 className="mesh-flow-line"
               />
             </svg>
@@ -406,7 +406,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
                 key={node.name}
                 className={`p-4 rounded-2xl glass-2 border transition-all duration-200 relative group ${
                   node.isCommander
-                    ? "border-emerald-500/50 shadow-[0_0_24px_rgba(16,185,129,0.18)] bg-emerald-500/[0.04]"
+                    ? "border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] bg-emerald-500/[0.04]"
                     : "border-[var(--border-glass-subtle)] hover:border-[var(--border-glass)]"
                 }`}
               >
@@ -414,8 +414,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span
-                      className={`h-2.5 w-2.5 rounded-full ${
-                        node.isCommander ? "bg-emerald-400 pulse-beacon" : "bg-slate-400/50"
+                      className={`h-2 w-2 rounded-full ${
+                        node.isCommander ? "bg-emerald-500" : "bg-slate-400/60"
                       }`}
                     />
                     <span className="font-bold text-xs text-snx-primary font-mono-snx">
@@ -441,7 +441,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
                   <span className="text-snx-muted">{node.statKey}</span>
                   <span
                     className={`font-semibold ${
-                      node.isCommander ? "text-emerald-400" : "text-snx-secondary"
+                      node.isCommander ? "text-emerald-600 dark:text-emerald-400" : "text-snx-secondary"
                     }`}
                   >
                     {node.statVal}
@@ -472,7 +472,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <span
                       className={`h-2 w-2 rounded-full flex-shrink-0 ${
-                        p.healthy ? "bg-emerald-400" : "bg-amber-400"
+                        p.healthy ? "bg-emerald-500" : "bg-amber-500"
                       }`}
                     />
                     <span className="font-bold text-xs text-snx-primary">{p.name}</span>
@@ -504,16 +504,16 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ stats }) => {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              <Zap className="w-3.5 h-3.5 text-amber-500" />
               <h3 className="sec-label">LIVE AUDIT STREAM</h3>
             </div>
-            <span className="h-2 w-2 rounded-full bg-emerald-400 pulse-beacon" />
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           </div>
 
           <div className="snx-card p-4 space-y-3 relative overflow-hidden">
             <p className="font-mono-snx text-[10px] text-snx-muted border-b border-[var(--border-glass-subtle)] pb-2 flex items-center justify-between">
               <span>Zero-trust mTLS & Merkle events</span>
-              <span className="text-emerald-400 font-bold">● live</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">● live</span>
             </p>
 
             <div className="space-y-2.5">

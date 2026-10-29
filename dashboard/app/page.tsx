@@ -161,64 +161,38 @@ function DashboardContent() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--canvas)] text-snx-primary relative overflow-hidden transition-colors duration-300">
-      {/* Background Dot Grid */}
-      <div className="absolute inset-0 bg-snx-dots pointer-events-none z-0" />
+    <div className="flex h-screen flex-col bg-slate-50/60 dark:bg-[#070B14] text-slate-900 dark:text-slate-100 overflow-hidden transition-colors duration-200">
+      {/* Top Navbar */}
+      <Navbar wsConnected={wsConnected} />
 
-      {/* Subtle Noise Texture Overlay */}
-      <div className="absolute inset-0 bg-snx-noise pointer-events-none z-0 opacity-40" />
+      {/* Main Workspace */}
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} />
 
-      {/* Drifting Ambient Nebula Orbs */}
-      <div className="orb orb-indigo w-[680px] h-[680px] -top-36 -left-36 z-0" />
-      <div className="orb orb-violet w-[560px] h-[560px] top-[28%] -right-32 z-0" />
-      <div className="orb orb-cyan   w-[500px] h-[500px] bottom-[8%] left-[18%] z-0" />
-      <div className="orb orb-emerald w-[460px] h-[460px] -bottom-24 right-[10%] z-0" />
-
-      {/* Foreground Interactive Content */}
-      <div className="relative z-10 flex flex-col flex-1 min-h-screen">
-        <Navbar wsConnected={wsConnected} />
-
-        <div className="flex-1 flex overflow-hidden">
-          <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} />
-
-          <main className="flex-1 overflow-y-auto p-5 sm:p-7 lg:p-8">
-            {activeTab === "overview" && <OverviewTab stats={stats} />}
-            {activeTab === "devices" && (
-              <DevicesTab devices={devices} onRefresh={refreshData} />
-            )}
-            {activeTab === "telemetry" && (
-              <TelemetryTab messages={telemetryMessages} />
-            )}
-            {activeTab === "objects" && (
-              <ObjectsTab objects={objects} nodes={nodes} onRefresh={refreshData} />
-            )}
-            {activeTab === "storage" && (
-              <StorageHealthTab health={health} nodes={nodes} onRefresh={refreshData} />
-            )}
-            {activeTab === "assets" && (
-              <AssetsTab assets={assets} onRefresh={refreshData} />
-            )}
-            {activeTab === "audit" && (
-              <AuditTab events={auditEvents} onRefresh={refreshData} />
-            )}
-            {activeTab === "principals" && (
-              <PrincipalsTab principals={principals} onRefresh={refreshData} />
-            )}
-          </main>
-        </div>
-
-        {/* Console Footer */}
-        <footer className="snx-chrome border-t py-2.5 px-6 flex flex-col sm:flex-row items-center justify-between gap-2 z-20 transition-colors duration-300">
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 pulse-beacon" />
-            <span className="text-[11px] font-mono-snx text-snx-muted">
-              SecureNodeX Edge Consensus · Chain 20260 (QBFT)
-            </span>
-          </div>
-          <div className="text-[11px] font-mono-snx text-snx-muted">
-            NIST P-256 ECC &bull; HRW Quorum N=4 R=3 W=2 &bull; ES256 Nonce Verification
-          </div>
-        </footer>
+        <main className="flex-1 overflow-y-auto p-5 sm:p-7">
+          {activeTab === "overview" && <OverviewTab stats={stats} />}
+          {activeTab === "devices" && (
+            <DevicesTab devices={devices} onRefresh={refreshData} />
+          )}
+          {activeTab === "telemetry" && (
+            <TelemetryTab messages={telemetryMessages} />
+          )}
+          {activeTab === "objects" && (
+            <ObjectsTab objects={objects} nodes={nodes} onRefresh={refreshData} />
+          )}
+          {activeTab === "storage" && (
+            <StorageHealthTab health={health} nodes={nodes} onRefresh={refreshData} />
+          )}
+          {activeTab === "assets" && (
+            <AssetsTab assets={assets} onRefresh={refreshData} />
+          )}
+          {activeTab === "audit" && (
+            <AuditTab events={auditEvents} onRefresh={refreshData} />
+          )}
+          {activeTab === "principals" && (
+            <PrincipalsTab principals={principals} onRefresh={refreshData} />
+          )}
+        </main>
       </div>
     </div>
   );
