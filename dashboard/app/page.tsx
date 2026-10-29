@@ -160,7 +160,7 @@ function DashboardContent() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-snx-bg text-gray-100">
+    <div className="flex min-h-screen flex-col bg-snx-bg text-gray-900">
       <Navbar wsConnected={wsConnected} />
 
       <div className="flex-1 flex overflow-hidden">

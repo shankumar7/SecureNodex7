@@ -3,12 +3,283 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 243, 244, 246;
-  --background-rgb: 11, 15, 25;
+  --snx-bg: #f8fafc;
+  --snx-card: #ffffff;
+  --snx-border: #e2e8f0;
+  --snx-text-title: #0f172a;
+  --snx-text-body: #334155;
+  --snx-text-muted: #64748b;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+html, body {
+  background-color: var(--snx-bg) !important;
+  color: var(--snx-text-title) !important;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background canvas */
+.bg-snx-bg {
+  background-color: var(--snx-bg) !important;
+}
+
+/* Surface cards & containers */
+[class*="bg-gray-950"],
+[class*="bg-gray-900"],
+aside,
+header {
+  background-color: #ffffff !important;
+}
+
+header {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(8px) !important;
+  border-bottom-color: #e2e8f0 !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+}
+
+aside {
+  background-color: #ffffff !important;
+  border-right-color: #e2e8f0 !important;
+}
+
+footer {
+  background-color: #ffffff !important;
+  border-top-color: #e2e8f0 !important;
+  color: #64748b !important;
+}
+
+/* Borders */
+[class*="border-gray-950"],
+[class*="border-gray-900"],
+[class*="border-gray-800"],
+[class*="border-gray-700"] {
+  border-color: #e2e8f0 !important;
+}
+
+/* Headings & Title texts */
+h1, h2, h3, h4, h5, h6,
+.text-white {
+  color: var(--snx-text-title) !important;
+}
+
+/* Retain pure white text specifically on filled action buttons & badges */
+button[class*="bg-blue-600"],
+button[class*="bg-blue-500"],
+button[class*="bg-purple-600"],
+button[class*="bg-purple-500"],
+button[class*="bg-emerald-600"],
+button[class*="bg-emerald-500"],
+button[class*="bg-indigo-600"],
+button[class*="bg-gradient-"],
+.bg-blue-600,
+.bg-purple-600,
+.bg-emerald-600,
+.bg-gradient-to-tr,
+.bg-gradient-to-r {
+  color: #ffffff !important;
+}
+
+button[class*="bg-blue-600"] *,
+button[class*="bg-blue-500"] *,
+button[class*="bg-purple-600"] *,
+button[class*="bg-purple-500"] *,
+button[class*="bg-emerald-600"] *,
+button[class*="bg-emerald-500"] *,
+button[class*="bg-indigo-600"] *,
+button[class*="bg-gradient-"] *,
+.bg-blue-600 *,
+.bg-purple-600 *,
+.bg-emerald-600 * {
+  color: #ffffff !important;
+}
+
+/* Secondary & Muted text colors */
+.text-gray-100 {
+  color: #0f172a !important;
+}
+.text-gray-200 {
+  color: #1e293b !important;
+}
+.text-gray-300 {
+  color: #334155 !important;
+}
+.text-gray-400 {
+  color: #64748b !important;
+}
+.text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+/* Table styling for light theme */
+thead, thead tr {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+thead th {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+tbody tr {
+  border-bottom-color: #f1f5f9 !important;
+  background-color: #ffffff !important;
+}
+
+tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+/* Top Banner Modern Light Gradient */
+.bg-gradient-to-r.from-blue-900\/30 {
+  background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 50%, #faf5ff 100%) !important;
+  border-color: #dbeafe !important;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.05) !important;
+}
+
+.bg-gradient-to-r.from-blue-900\/30 h2 {
+  color: #1e3a8a !important;
+}
+
+.bg-gradient-to-r.from-blue-900\/30 p {
+  color: #3b82f6 !important;
+}
+
+/* Navigation items in sidebar */
+aside button:not(.bg-blue-600) {
+  color: #475569 !important;
+}
+
+aside button:not(.bg-blue-600):hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+aside button:not(.bg-blue-600) span {
+  color: inherit !important;
+}
+
+/* Metric / Stat Cards in Light Theme */
+.rounded-xl.border {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Pill badges on light backgrounds */
+.bg-blue-950\/40,
+.bg-blue-500\/10 {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border-color: #bfdbfe !important;
+}
+
+.bg-emerald-950\/40,
+.bg-emerald-500\/10 {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+  border-color: #a7f3d0 !important;
+}
+
+.bg-purple-950\/40,
+.bg-purple-500\/10 {
+  background-color: #faf5ff !important;
+  color: #6b21a8 !important;
+  border-color: #e9d5ff !important;
+}
+
+.bg-yellow-950\/40,
+.bg-yellow-500\/10 {
+  background-color: #fffbeb !important;
+  color: #b45309 !important;
+  border-color: #fde68a !important;
+}
+
+.bg-red-950\/40,
+.bg-red-500\/10 {
+  background-color: #fef2f2 !important;
+  color: #b91c1c !important;
+  border-color: #fecaca !important;
+}
+
+/* Center Status Pills in Navbar */
+header .rounded-full.bg-gray-900 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+header .rounded-full.bg-gray-900 span {
+  color: #334155 !important;
+}
+
+/* Modals & Popups */
+.fixed .bg-gray-900,
+.fixed .bg-gray-950 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.fixed input,
+.fixed select,
+.fixed textarea {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.fixed input:focus,
+.fixed select:focus,
+.fixed textarea:focus {
+  border-color: #3b82f6 !important;
+  background-color: #ffffff !important;
+}
+
+/* Action buttons in tables (Placement, Verify, Download) */
+table button {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+table button:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+table button:has(svg.text-purple-400),
+table button.text-purple-300 {
+  background-color: #faf5ff !important;
+  border-color: #e9d5ff !important;
+  color: #6b21a8 !important;
+}
+table button:has(svg.text-purple-400):hover,
+table button.text-purple-300:hover {
+  background-color: #f3e8ff !important;
+}
+
+table button:has(svg.text-emerald-400),
+table button.text-emerald-300 {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #047857 !important;
+}
+table button:has(svg.text-emerald-400):hover,
+table button.text-emerald-300:hover {
+  background-color: #d1fae5 !important;
+}
+
+table button:has(svg.text-blue-400),
+table button.text-blue-300 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+table button:has(svg.text-blue-400):hover,
+table button.text-blue-300:hover {
+  background-color: #dbeafe !important;
 }
