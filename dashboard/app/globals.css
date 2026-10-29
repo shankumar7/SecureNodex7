@@ -310,49 +310,16 @@ header button.bg-gray-900\/90 p {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
 }
 
-/* Action buttons in tables (Placement, Verify, Download) */
-table button {
-  background-color: #f1f5f9 !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #0f172a !important;
-  font-weight: 600 !important;
-  transition: all 0.15s ease-in-out !important;
+/* Action buttons in tables (Placement, Verify, Download, Tombstone) */
+table button:not([class*="bg-"]) {
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  font-weight: 600;
+  transition: all 0.15s ease-in-out;
 }
 
-table button:hover {
-  background-color: #e2e8f0 !important;
-  color: #0f172a !important;
-}
-
-table button:has(svg.text-purple-400),
-table button.text-purple-300 {
-  background-color: #f3e8ff !important;
-  border-color: #d8b4fe !important;
-  color: #581c87 !important;
-}
-table button:has(svg.text-purple-400):hover,
-table button.text-purple-300:hover {
-  background-color: #e9d5ff !important;
-}
-
-table button:has(svg.text-emerald-400),
-table button.text-emerald-300 {
-  background-color: #d1fae5 !important;
-  border-color: #6ee7b7 !important;
-  color: #065f46 !important;
-}
-table button:has(svg.text-emerald-400):hover,
-table button.text-emerald-300:hover {
-  background-color: #a7f3d0 !important;
-}
-
-table button:has(svg.text-blue-400),
-table button.text-blue-300 {
-  background-color: #dbeafe !important;
-  border-color: #93c5fd !important;
-  color: #1e40af !important;
-}
-table button:has(svg.text-blue-400):hover,
-table button.text-blue-300:hover {
-  background-color: #bfdbfe !important;
+table button:not([class*="bg-"]):hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
 }

@@ -193,7 +193,7 @@ function DashboardContent() {
         </main>
       </div>
 
-      <footer className="border-t border-gray-900 bg-gray-950/60 py-3 px-6 text-center text-xs text-gray-500">
+      <footer className="border-t border-slate-200 bg-white py-3.5 px-6 text-center text-xs text-slate-600 font-semibold shadow-xs">
         SecureNodeX IoT Trust & Storage Platform &copy; 2026 | Team CodeCommit | Smart India Hackathon
       </footer>
     </div>
