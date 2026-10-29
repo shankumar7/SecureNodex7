@@ -1,0 +1,25 @@
+# SecureNodeX .gitignore (docs/09 section 10)
+secrets/
+*.key
+*.pem
+!**/ca-chain.pem.example
+.env
+pki/root/
+pki/out/
+firmware/credentials/
+node_modules/
+__pycache__/
+.venv/
+deployments/*.local.json
+data/
+
+# Build and IDE caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.next/
+dist/
+out/
+.DS_Store

@@ -1,0 +1,17 @@
+{
+  "name": "securenodex-contracts",
+  "version": "0.1.0",
+  "description": "SecureNodeX Solidity Smart Contracts",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.ts --network hardhat",
+    "deploy:besu": "hardhat run scripts/deploy.ts --network besu"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.0.2",
+    "hardhat": "^2.22.6",
+    "typescript": "^5.5.3"
+  }
+}

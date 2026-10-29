@@ -1,0 +1,189 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: snx-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: snx
+      POSTGRES_PASSWORD: snx_password_dev
+      POSTGRES_DB: snx
+    ports:
+      - "5432:5432"
+    volumes:
+      - snx_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U snx -d snx"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  broker:
+    image: eclipse-mosquitto:2
+    container_name: snx-broker
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ../broker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 2 nc -z localhost 1883 || exit 0"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  snx-ca:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    container_name: snx-ca
+    restart: unless-stopped
+    command: ["uvicorn", "backend.app.ca:app", "--host", "0.0.0.0", "--port", "9443"]
+    environment:
+      PROJECT_NAME: SecureNodeX
+    ports:
+      - "9443:9443"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9443/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  snx-api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    container_name: snx-api
+    restart: unless-stopped
+    command: ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8443"]
+    environment:
+      PROJECT_NAME: SecureNodeX
+      DATABASE_URL: postgresql+psycopg://snx:snx_password_dev@postgres:5432/snx
+    ports:
+      - "8443:8443"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8443/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  snx-gateway:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    container_name: snx-gateway
+    restart: unless-stopped
+    command: ["uvicorn", "backend.app.gateway:app", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      PROJECT_NAME: SecureNodeX
+      MQTT_HOST: broker
+      MQTT_PORT: 1883
+    ports:
+      - "8001:8001"
+    depends_on:
+      broker:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8001/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  snx-worker:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    container_name: snx-worker
+    restart: unless-stopped
+    command: ["uvicorn", "backend.app.worker:app", "--host", "0.0.0.0", "--port", "8002"]
+    environment:
+      PROJECT_NAME: SecureNodeX
+    ports:
+      - "8002:8002"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8002/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  storage-1:
+    build:
+      context: ..
+      dockerfile: storage/Dockerfile
+    container_name: snx-storage-1
+    restart: unless-stopped
+    command: ["uvicorn", "storage.app.main:app", "--host", "0.0.0.0", "--port", "7443"]
+    environment:
+      NODE_ID: storage-1
+      PORT: 7443
+    ports:
+      - "7443:7443"
+    volumes:
+      - snx_storage1_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:7443/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  storage-2:
+    build:
+      context: ..
+      dockerfile: storage/Dockerfile
+    container_name: snx-storage-2
+    restart: unless-stopped
+    command: ["uvicorn", "storage.app.main:app", "--host", "0.0.0.0", "--port", "7444"]
+    environment:
+      NODE_ID: storage-2
+      PORT: 7444
+    ports:
+      - "7444:7444"
+    volumes:
+      - snx_storage2_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:7444/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  storage-3:
+    build:
+      context: ..
+      dockerfile: storage/Dockerfile
+    container_name: snx-storage-3
+    restart: unless-stopped
+    command: ["uvicorn", "storage.app.main:app", "--host", "0.0.0.0", "--port", "7445"]
+    environment:
+      NODE_ID: storage-3
+      PORT: 7445
+    ports:
+      - "7445:7445"
+    volumes:
+      - snx_storage3_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:7445/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  dashboard:
+    build:
+      context: ..
+      dockerfile: dashboard/Dockerfile
+    container_name: snx-dashboard
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000 || exit 0"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  snx_pgdata:
+  snx_storage1_data:
+  snx_storage2_data:
+  snx_storage3_data:

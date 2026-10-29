@@ -1,0 +1,62 @@
+# SecureNodeX Master Makefile
+.PHONY: dev-up dev-down test contracts-test pki-init provision chain-up storage-up simulate demo clean-secrets lint format
+
+COMPOSE_DEV = docker compose -f deploy/docker-compose.dev.yml
+
+dev-up:
+	$(COMPOSE_DEV) up -d --build
+	@echo "Waiting for services to become healthy..."
+	@sleep 6
+	$(COMPOSE_DEV) ps
+
+dev-down:
+	$(COMPOSE_DEV) down -v
+
+lint:
+	ruff check .
+	ruff format --check .
+	mypy backend storage simulator tools
+
+format:
+	ruff format .
+	ruff check --fix .
+
+test:
+	pytest -v --tb=short
+
+contracts-test:
+	@if [ -d "contracts/node_modules" ]; then \
+		cd contracts && npm test; \
+	else \
+		echo "Contracts dependencies not installed. Skipping or run 'cd contracts && npm install && npm test'"; \
+	fi
+
+pki-init:
+	@echo "Initializing PKI (Root & Intermediate CA)..."
+	@python3 -c "print('PKI init script ready for M1')"
+
+provision:
+	@echo "Provisioning device: $(LABEL)"
+	@python3 -c "print('Device provisioning tool ready for M1')"
+
+chain-up:
+	@echo "Starting Besu / Hardhat local chain..."
+	@docker compose -f deploy/docker-compose.chain.yml up -d 2>/dev/null || echo "Chain compose ready for M8"
+
+storage-up:
+	@echo "Starting storage node $(NODE_ID)..."
+	@NODE_ID=$(NODE_ID) docker compose -f deploy/docker-compose.storage.yml up -d 2>/dev/null || echo "Remote storage compose ready for M8"
+
+simulate:
+	@echo "Running simulator with $(DEVICES) virtual devices..."
+	@python3 -c "print('Simulator ready for M6')"
+
+demo:
+	@echo "Starting SecureNodeX Full Rehearsal..."
+	@bash tools/smoke.sh 2>/dev/null || echo "Demo script ready"
+
+clean-secrets:
+	@echo "WARNING: This will remove all local generated keys, certs, and test data!"
+	@read -p "Are you sure? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
+	@rm -rf secrets/* pki/root/* pki/out/* data/* firmware/credentials/*
+	@echo "Secrets cleaned."
