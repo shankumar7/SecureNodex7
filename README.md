@@ -46,11 +46,11 @@ flowchart TD
         Healer["Autonomous Self-Healer\n- Continuous 8s Scrubbing\n- Auto Peer Re-replication"]
     end
 
-    subgraph StorageCluster["Decentralized Storage Cluster (Quorum N=3, W=2, R=2)"]
-        S_PI["Raspberry Pi Node\n(172.31.6.75)"]
-        S_L2["Laptop Node 2\n(10.120.11.212)"]
-        S_L3["Laptop Node 3\n(10.120.11.171)"]
-        S_L4["Laptop Node 4\n(10.120.11.158)"]
+    subgraph StorageCluster["Decentralized Storage Cluster (4 Nodes: Quorum N=4, R=3, W=2)"]
+        S_L1["Laptop 1 (Master + Storage 1)\n(:7443)"]
+        S_L2["Laptop Node 2\n(:7443)"]
+        S_L3["Laptop Node 3\n(:7443)"]
+        S_PI["Raspberry Pi Node 4\n(:7443)"]
     end
 
     subgraph BlockchainPlane["Private EVM Blockchain (Chain ID: 20260)"]
@@ -60,10 +60,10 @@ flowchart TD
     User -->|REST / JWT ES256| API
     Pi -->|mTLS / Signed Envelopes| API
     API --> Coord
-    Coord -->|AES-256 Chunks| S_PI
+    Coord -->|AES-256 Chunks| S_L1
     Coord -->|AES-256 Chunks| S_L2
     Coord -->|AES-256 Chunks| S_L3
-    Coord -->|AES-256 Chunks| S_L4
+    Coord -->|AES-256 Chunks| S_PI
     Coord -->|Anchor Merkle Root| Chain
     Healer -.->|Active Scrub & Repair| StorageCluster
     Auditor -->|Direct JSON-RPC 2.0| Chain

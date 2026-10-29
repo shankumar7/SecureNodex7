@@ -63,28 +63,30 @@ If the jury asks: "Show me where ECC is used":
    - Purpose: Signs all blockchain transactions (r, s, v signatures).
 
 
-4. ROLES OF EACH DEVICE IN TODAY'S DEMO
+4. ROLES OF EACH OF THE 4 DEVICES IN YOUR SETUP
 --------------------------------------------------------------------------------
-- Laptop 1 (Mac / Master Controller):
-  * IP: 10.120.11.70
-  * Runs: Dashboard UI (:3000), API Server (:8443), Primary Blockchain Node (:8545).
+- Laptop 1 (Master Controller & Storage Node 1):
+  * Runs: Dashboard UI (:3000), Gateway API (:8443), EVM Blockchain (:8545), 
+    and local storage daemon (:7443).
+  * Coordinates file splitting, Merkle root calculation, and on-chain anchoring.
 
-- Raspberry Pi (Physical IoT Edge Storage Node):
-  * IP: 172.31.6.75
-  * Runs: snx-storage daemon on port 7443. Holds real chunks on its SD card.
+- Laptop 2 (Teammate Storage Node 2):
+  * Runs: Docker storage node (:7443).
+  * Holds physical encrypted chunks (AES-256-GCM) on disk.
 
-- Laptop 2, 3, 4 (Decentralized Storage Nodes + QBFT Validators):
-  * Laptop 2: 10.120.11.212
-  * Laptop 3: 10.120.11.171
-  * Laptop 4: 10.120.11.158
-  * Each runs a decentralized storage daemon and Besu validator peering over P2P :30303.
+- Laptop 3 (Teammate Storage Node 3 & Independent Auditor):
+  * Runs: Docker storage node (:7443) + auditor inspection CLI.
+  * Holds physical encrypted chunks and validates blockchain blocks directly.
 
-- Laptop 5 (Blockchain Auditor / Inspector):
-  * IP: 10.120.11.242
-  * Runs live block inspection tools against the blockchain.
+- Device 4: Raspberry Pi (Physical IoT Edge Storage Node 4):
+  * Runs: snx-storage daemon on port 7443 (`storage/start_pi_node.sh`).
+  * Holds real content-addressed chunks on physical SD card storage (`~/storage_data`).
 
-- Laptop 6 (QA & Chaos Security Demonstrator):
-  * Fires attack scripts (chunk tampering, flood) to prove cluster defense.
+* CLUSTER REDUNDANCY:
+  Quorum is configured for N=4, R=3, W=2:
+  Every uploaded file is sliced and distributed across 3 of the 4 devices.
+  Any single laptop or the Raspberry Pi can disconnect or shut down with 
+  ZERO data loss and full download availability!
 
 
 ================================================================================
