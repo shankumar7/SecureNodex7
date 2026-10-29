@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "../context/ThemeContext";
 
 export const metadata: Metadata = {
   title: "SecureNodeX — Control & Audit Plane",
-  description: "Minimalist, zero-trust cryptographic edge cluster and decentralized storage engine.",
+  description: "Zero-trust cryptographic edge cluster and decentralized storage engine.",
 };
 
 export default function RootLayout({
@@ -12,9 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="light">
-      <body className="min-h-screen bg-[#fbfbfa] text-zinc-900 antialiased selection:bg-zinc-200 selection:text-zinc-900">
-        {children}
+    <html lang="en" data-theme="dark" className="dark" suppressHydrationWarning>
+      <body className="min-h-screen antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
