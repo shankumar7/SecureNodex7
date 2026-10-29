@@ -2,6 +2,7 @@
   "name": "securenodex-contracts",
   "version": "0.1.0",
   "description": "SecureNodeX Solidity Smart Contracts",
+  "license": "MIT",
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
