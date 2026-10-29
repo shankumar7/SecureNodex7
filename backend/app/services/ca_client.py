@@ -6,12 +6,10 @@ import httpx
 
 from backend.app.config import settings
 from pki.ca_core import (
-    calc_spki_fingerprint,
-    create_device_keypair,
-    issue_certificate,
-    load_ca,
-    save_crl,
-    generate_crl,
+    compute_public_key_fingerprint,
+    generate_p256_private_key,
+    issue_leaf_certificate,
+    load_certificate,
     load_private_key,
 )
 
@@ -32,9 +30,9 @@ class CAClient:
                     f"{self.ca_base_url}/v1/ca/issue",
                     json={
                         "csr_pem": csr_pem,
-                        "profile": "device",
+                        "kind": "device",
                         "principal_id": principal_id,
-                        "ttl_hours": settings.DEVICE_CERT_TTL_HOURS,
+                        "validity_hours": settings.DEVICE_CERT_TTL_HOURS,
                     },
                 )
                 if res.status_code == 200:
@@ -45,8 +43,9 @@ class CAClient:
         # Fallback to in-process PKI if local intermediate CA exists
         return self._issue_in_process(csr_pem, principal_id, "device")
 
-    def _issue_in_process(self, csr_pem: str, principal_id: str, profile: str) -> dict[str, Any]:
+    def _issue_in_process(self, csr_pem: str, principal_id: str, kind: str) -> dict[str, Any]:
         from cryptography import x509
+        from cryptography.hazmat.backends import default_backend
         from cryptography.hazmat.primitives import serialization
         import os
 
@@ -57,16 +56,21 @@ class CAClient:
         if not (os.path.exists(ca_key_path) and os.path.exists(ca_cert_path)):
             raise RuntimeError("Intermediate CA keys not found for in-process issuance")
 
-        ca_key, ca_cert = load_ca(ca_key_path, ca_cert_path)
-        csr = x509.load_pem_x509_csr(csr_pem.encode("utf-8"))
+        with open(ca_key_path, "rb") as f:
+            ca_key = load_private_key(f.read())
+        with open(ca_cert_path, "rb") as f:
+            ca_cert = load_certificate(f.read())
 
-        cert = issue_certificate(
-            csr=csr,
+        csr = x509.load_pem_x509_csr(csr_pem.encode("utf-8"), default_backend())
+
+        cert = issue_leaf_certificate(
             ca_key=ca_key,
             ca_cert=ca_cert,
-            profile_name=profile,
+            csr_or_pubkey=csr,
+            kind="device",
+            common_name=principal_id,
             principal_id=principal_id,
-            ttl_hours=settings.DEVICE_CERT_TTL_HOURS,
+            validity_hours=settings.DEVICE_CERT_TTL_HOURS,
         )
 
         with open(ca_cert_path) as f:
@@ -74,9 +78,9 @@ class CAClient:
         with open(root_cert_path) as f:
             root_pem = f.read()
 
-        chain_pem = inter_pem + "\n" + root_pem
+        chain_pem = inter_pem.strip() + "\n" + root_pem.strip()
         cert_pem = cert.public_bytes(serialization.Encoding.PEM).decode("utf-8")
-        fp = calc_spki_fingerprint(cert.public_key())
+        fp = compute_public_key_fingerprint(cert.public_key())
 
         return {
             "certificate_pem": cert_pem,

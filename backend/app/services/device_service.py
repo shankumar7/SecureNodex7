@@ -18,7 +18,7 @@ from backend.app.chain.client import chain_client
 from backend.app.db.models import Device
 from backend.app.services.audit_service import audit_service
 from backend.app.services.ca_client import ca_client
-from pki.ca_core import calc_spki_fingerprint, create_device_keypair, generate_device_csr
+from pki.ca_core import compute_public_key_fingerprint, create_csr, generate_p256_private_key
 
 logger = logging.getLogger("snx.devices")
 
@@ -79,14 +79,14 @@ class DeviceService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Device not found")
 
         # Generate EC P-256 keypair & CSR
-        priv_key = create_device_keypair()
+        priv_key = generate_p256_private_key()
         priv_pem = priv_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption(),
         ).decode("utf-8")
 
-        csr = generate_device_csr(priv_key, device_id)
+        csr = create_csr(priv_key, common_name=device_id, kind="device")
         csr_pem = csr.public_bytes(serialization.Encoding.PEM).decode("utf-8")
 
         # Request certificate from CA

@@ -32,7 +32,6 @@ class EventIndexer:
         # 1. Sync IdentityRegistry events
         identity_contract = self.client.contracts.get("IdentityRegistry")
         if identity_contract:
-            # IdentityRegistered
             try:
                 registered_events = identity_contract.events.IdentityRegistered.get_logs(
                     from_block=from_block,
@@ -44,7 +43,6 @@ class EventIndexer:
             except Exception as e:
                 logger.warning(f"Error indexing IdentityRegistered: {e}")
 
-            # IdentityStatusChanged
             try:
                 status_events = identity_contract.events.IdentityStatusChanged.get_logs(
                     from_block=from_block,
@@ -56,7 +54,6 @@ class EventIndexer:
             except Exception as e:
                 logger.warning(f"Error indexing IdentityStatusChanged: {e}")
 
-            # IdentityKeyRotated
             try:
                 rotated_events = identity_contract.events.IdentityKeyRotated.get_logs(
                     from_block=from_block,
@@ -106,7 +103,6 @@ class EventIndexer:
         fp_hex = "0x" + fp_bytes.hex()
         tx_hash = event["transactionHash"].hex()
 
-        # Check if device or principal
         id_hex = "0x" + identity_id_bytes.hex()
         stmt = select(Device).where(Device.id == id_hex)
         device = (await db.execute(stmt)).scalar_one_or_none()
@@ -169,7 +165,6 @@ class EventIndexer:
         cid = "0x" + args["correlationId"].hex()
         tx_hash = event["transactionHash"].hex()
 
-        # Check if already present in DB
         stmt = select(AuditEvent).where(AuditEvent.seq == seq)
         existing = (await db.execute(stmt)).scalar_one_or_none()
         if not existing:
