@@ -185,6 +185,15 @@ contract AssetRegistry is ERC721, OperatorAccess {
         return string(str);
     }
 
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, AccessControl)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
     // Disable standard ERC-721 transfer functions per docs/04 section 2.4
     function approve(address, uint256) public pure override {
         revert StandardTransfersDisabled();
