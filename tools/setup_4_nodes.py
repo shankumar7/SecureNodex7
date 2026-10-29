@@ -61,9 +61,9 @@ def main():
         ips["storage-laptop3"] = args[2]
         ips["storage-pi"] = args[3]
     else:
-        env_l1 = os.getenv("LAPTOP1_HOST", "127.0.0.1")
-        env_l2 = os.getenv("LAPTOP2_HOST", "10.120.11.212")
-        env_l3 = os.getenv("LAPTOP3_HOST", "10.120.11.171")
+        env_l1 = os.getenv("LAPTOP1_HOST", "10.87.198.70")
+        env_l2 = os.getenv("LAPTOP2_HOST", "10.87.198.135")
+        env_l3 = os.getenv("LAPTOP3_HOST", "10.87.198.171")
         env_pi = os.getenv("PI_HOST", "172.31.6.75")
         
         print("Usage:")

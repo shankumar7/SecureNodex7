@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 import httpx
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -57,6 +57,58 @@ class RegisterNodeRequest(BaseModel):
     endpoint: str = Field(..., min_length=1, max_length=255)
     capacity: int = Field(default=10 * 1024 * 1024 * 1024, ge=1024)
     cert_fingerprint: str = Field(default="", max_length=64)
+
+
+class JoinClusterRequest(BaseModel):
+    node_id: str = Field(..., min_length=1, max_length=64)
+    port: int = Field(default=7443, ge=1, le=65535)
+    endpoint: str | None = Field(default=None, max_length=255)
+    capacity: int = Field(default=10 * 1024 * 1024 * 1024, ge=1024)
+
+
+@router.post("/storage/nodes/join")
+async def join_cluster(
+    req: JoinClusterRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, Any]:
+    """Auto-join endpoint for any cluster node. Auto-detects caller IP if endpoint is not specified."""
+    caller_ip = request.client.host if request.client else "127.0.0.1"
+    endpoint = req.endpoint or f"http://{caller_ip}:{req.port}"
+
+    stmt = select(StorageNode).where(StorageNode.id == req.node_id)
+    existing = (await db.execute(stmt)).scalar_one_or_none()
+    if existing:
+        existing.endpoint = endpoint
+        existing.free_bytes = req.capacity
+        existing.state = "UP"
+        existing.last_heartbeat = datetime.now(timezone.utc)
+        await db.commit()
+        return {
+            "status": "joined_updated",
+            "node_id": req.node_id,
+            "endpoint": endpoint,
+            "detected_ip": caller_ip,
+        }
+
+    node = StorageNode(
+        id=req.node_id,
+        endpoint=endpoint,
+        state="UP",
+        free_bytes=req.capacity,
+        used_bytes=0,
+        chunk_count=0,
+        draining=0,
+        last_heartbeat=datetime.now(timezone.utc),
+    )
+    db.add(node)
+    await db.commit()
+    return {
+        "status": "joined_registered",
+        "node_id": req.node_id,
+        "endpoint": endpoint,
+        "detected_ip": caller_ip,
+    }
 
 
 @router.get("/storage/nodes")
