@@ -1,0 +1,12 @@
+# SecureNodeX Broker Topic ACL
+# Pattern: snx/v1/dev/%u/# matches username %u (authenticated certificate CN)
+
+pattern readwrite snx/v1/dev/%u/#
+pattern read snx/v1/dev/%u/status
+
+# Gateway service key can read/write across devices
+user snx-gateway
+topic read snx/v1/dev/+/telemetry
+topic read snx/v1/dev/+/event
+topic read snx/v1/dev/+/status
+topic write snx/v1/dev/+/cmd

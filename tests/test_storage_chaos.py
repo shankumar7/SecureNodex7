@@ -131,6 +131,8 @@ async def test_multi_node_upload_and_chaos_scenarios(cluster_5_nodes: list[MockS
     assert read_data_2 == payload
 
     # --- 5. AT-20: Corrupt a chunk on one live node -> read detects hash mismatch, uses other replica ---
+    cluster_5_nodes[0].alive = True  # Restore nodes so multiple replicas are available
+    cluster_5_nodes[1].alive = True
     live_node = cluster_5_nodes[2]
     first_chunk_id = manifest["chunks"][0]["id"]
     if live_node.store.has_chunk(first_chunk_id):

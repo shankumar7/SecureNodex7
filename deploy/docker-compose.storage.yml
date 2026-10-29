@@ -1,0 +1,28 @@
+version: "3.8"
+
+# SecureNodeX Hosts L2..L4, Pi1, Pi2: Decentralized Storage Node (snx-storage)
+
+services:
+  storage-node:
+    build:
+      context: ..
+      dockerfile: storage/Dockerfile
+    container_name: snx-storage-${NODE_ID:-storage-1}
+    restart: unless-stopped
+    environment:
+      - NODE_ID=${NODE_ID:-storage-1}
+      - STORAGE_PORT=${STORAGE_PORT:-7443}
+      - DATA_DIR=/data/chunks
+      - MTLS_REQUIRED=false
+    volumes:
+      - storage_data:/data/chunks
+    ports:
+      - "${STORAGE_PORT:-7443}:7443"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7443/v1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  storage_data:

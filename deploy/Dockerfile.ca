@@ -1,0 +1,18 @@
+# Multi-arch Dockerfile for snx-ca (linux/amd64, linux/arm64)
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml .
+RUN pip install --no-cache-dir .
+
+COPY pki /app/pki
+
+EXPOSE 9443
+
+CMD ["uvicorn", "pki.ca_service:app", "--host", "0.0.0.0", "--port", "9443"]

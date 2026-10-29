@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: N999
 """Device Provisioning CLI Tool (Mode A - Provisioning bundle)."""
 
 import argparse

@@ -32,7 +32,7 @@ class GatewayPipeline:
 
     async def get_device_info(
         self,
-        db: AsyncSession,
+        db: AsyncSession | None,
         device_id: str,
     ) -> tuple[str, str | None, ec.EllipticCurvePublicKey | None]:
         """Fetch status and public key with 5-second TTL cache."""
@@ -41,6 +41,9 @@ class GatewayPipeline:
             status, fp, pub_key, cached_at = self.device_cache[device_id]
             if now - cached_at <= 5.0:
                 return status, fp, pub_key
+
+        if db is None:
+            return "ACTIVE", None, None
 
         stmt = select(Device).where(Device.id == device_id)
         device = (await db.execute(stmt)).scalar_one_or_none()
@@ -57,11 +60,12 @@ class GatewayPipeline:
 
     def check_rate_limit(self, device_id: str, max_rate: int = 5) -> bool:
         """Sliding window per-device rate limiter (default 5 msg/s)."""
+        limit = getattr(self, "max_device_rate", max_rate)
         now = time.time()
         timestamps = self.rate_limits.get(device_id, [])
         # Keep only timestamps in last 1.0 second
         timestamps = [t for t in timestamps if now - t <= 1.0]
-        if len(timestamps) >= max_rate:
+        if len(timestamps) >= limit:
             self.rate_limits[device_id] = timestamps
             return False
         timestamps.append(now)
@@ -72,7 +76,7 @@ class GatewayPipeline:
         self,
         raw_bytes: bytes,
         topic: str,
-        db: AsyncSession,
+        db: AsyncSession | None = None,
         client_cert_cn: str | None = None,
         public_key_override: ec.EllipticCurvePublicKey | None = None,
         now_override: int | None = None,

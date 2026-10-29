@@ -1,0 +1,38 @@
+version: "3.8"
+
+# SecureNodeX Host Pi1: Ingestion Gateway & Broker
+# Services: snx-broker (Mosquitto mTLS), snx-gateway (Telemetry Ingestion & Merkle Batching)
+
+services:
+  broker:
+    image: eclipse-mosquitto:2.0
+    container_name: snx-broker
+    restart: unless-stopped
+    volumes:
+      - ../deploy/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ../pki:/mosquitto/pki:ro
+    ports:
+      - "8883:8883"
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h localhost -p 8883 --cafile /mosquitto/pki/intermediate/ca-chain.pem -t '$$SYS/#' -C 1 || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  snx-gateway:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.gateway
+    container_name: snx-gateway
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - broker
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 5

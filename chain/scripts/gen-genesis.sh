@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# SecureNodeX Besu QBFT Genesis Generator
+# Configures QBFT consensus with 4 validators, 2s block period, zero gas, and funded operator.
+
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+GENESIS_FILE="${BASE_DIR}/genesis.json"
+
+echo "[+] Generating Besu QBFT genesis.json (Chain ID: 20260)..."
+
+cat << 'EOF' > "${GENESIS_FILE}"
+{
+  "config": {
+    "chainId": 20260,
+    "homesteadBlock": 0,
+    "eip150Block": 0,
+    "eip155Block": 0,
+    "eip158Block": 0,
+    "byzantiumBlock": 0,
+    "constantinopleBlock": 0,
+    "petersburgBlock": 0,
+    "istanbulBlock": 0,
+    "berlinBlock": 0,
+    "londonBlock": 0,
+    "cancunBlock": 0,
+    "qbft": {
+      "blockperiodseconds": 2,
+      "epochlength": 30000,
+      "requesttimeoutseconds": 4,
+      "validators": [
+        "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",
+        "0x627306090abab3a6e1400e9345bc60c78a8bef57",
+        "0xf17f52151ebef6c7334fad080c5704d77216b732",
+        "0xc5fdf4076b8f3a5357c5e395ab970b5b54098fef"
+      ]
+    },
+    "zeroBaseFee": true
+  },
+  "nonce": "0x0",
+  "timestamp": "0x58ee40ba",
+  "extraData": "0xf87a94fe3b557e8fb62b89f4916b721be55ceb828dbd7394627306090abab3a6e1400e9345bc60c78a8bef5794f17f52151ebef6c7334fad080c5704d77216b73294c5fdf4076b8f3a5357c5e395ab970b5b54098fefc080c0",
+  "gasLimit": "0x1fffffffffffff",
+  "difficulty": "0x1",
+  "mixHash": "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
+  "alloc": {
+    "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73": {
+      "balance": "0x10000000000000000000000000000000"
+    },
+    "0x627306090abab3a6e1400e9345bc60c78a8bef57": {
+      "balance": "0x10000000000000000000000000000000"
+    },
+    "0xf17f52151ebef6c7334fad080c5704d77216b732": {
+      "balance": "0x10000000000000000000000000000000"
+    },
+    "0xc5fdf4076b8f3a5357c5e395ab970b5b54098fef": {
+      "balance": "0x10000000000000000000000000000000"
+    }
+  }
+}
+EOF
+
+echo "[+] Besu genesis file generated at ${GENESIS_FILE}"
