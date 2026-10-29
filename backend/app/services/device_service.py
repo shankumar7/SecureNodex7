@@ -161,7 +161,6 @@ class DeviceService:
         now = datetime.now(timezone.utc)
         stmt = select(Device).where(
             Device.enrollment_token == token,
-            Device.enrollment_token_expires_at > now,
             Device.status == "PENDING",
         )
         device = (await db.execute(stmt)).scalar_one_or_none()
@@ -170,6 +169,16 @@ class DeviceService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid or expired enrollment token",
             )
+
+        if device.enrollment_token_expires_at:
+            exp = device.enrollment_token_expires_at
+            if exp.tzinfo is None:
+                exp = exp.replace(tzinfo=timezone.utc)
+            if exp < now:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid or expired enrollment token",
+                )
 
         ca_res = await ca_client.issue_device_cert(csr_pem=csr_pem, principal_id=device.id)
         cert_pem = ca_res["certificate_pem"]

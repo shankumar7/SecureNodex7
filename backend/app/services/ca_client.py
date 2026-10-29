@@ -53,13 +53,24 @@ class CAClient:
         ca_cert_path = "pki/certs/intermediate_ca.crt"
         root_cert_path = "pki/certs/root_ca.crt"
 
-        if not (os.path.exists(ca_key_path) and os.path.exists(ca_cert_path)):
-            raise RuntimeError("Intermediate CA keys not found for in-process issuance")
+        from pki.ca_core import create_intermediate_ca, create_root_ca
 
-        with open(ca_key_path, "rb") as f:
-            ca_key = load_private_key(f.read())
-        with open(ca_cert_path, "rb") as f:
-            ca_cert = load_certificate(f.read())
+        if os.path.exists(ca_key_path) and os.path.exists(ca_cert_path):
+            with open(ca_key_path, "rb") as f:
+                ca_key = load_private_key(f.read())
+            with open(ca_cert_path, "rb") as f:
+                ca_cert = load_certificate(f.read())
+            with open(ca_cert_path) as f:
+                inter_pem = f.read()
+            root_pem = inter_pem
+            if os.path.exists(root_cert_path):
+                with open(root_cert_path) as f:
+                    root_pem = f.read()
+        else:
+            root_k, root_c = create_root_ca()
+            ca_key, ca_cert = create_intermediate_ca(root_k, root_c)
+            inter_pem = ca_cert.public_bytes(serialization.Encoding.PEM).decode("utf-8")
+            root_pem = root_c.public_bytes(serialization.Encoding.PEM).decode("utf-8")
 
         csr = x509.load_pem_x509_csr(csr_pem.encode("utf-8"), default_backend())
 
@@ -72,11 +83,6 @@ class CAClient:
             principal_id=principal_id,
             validity_hours=settings.DEVICE_CERT_TTL_HOURS,
         )
-
-        with open(ca_cert_path) as f:
-            inter_pem = f.read()
-        with open(root_cert_path) as f:
-            root_pem = f.read()
 
         chain_pem = inter_pem.strip() + "\n" + root_pem.strip()
         cert_pem = cert.public_bytes(serialization.Encoding.PEM).decode("utf-8")

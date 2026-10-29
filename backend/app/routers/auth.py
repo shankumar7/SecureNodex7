@@ -69,6 +69,14 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)) -> LoginR
     )
 
 
+def ensure_utc(dt: datetime | None) -> datetime | None:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
 @router.post("/auth/refresh", response_model=LoginResponse)
 async def refresh_token(req: RefreshRequest, db: AsyncSession = Depends(get_db)) -> LoginResponse:
     """Rotate refresh token and issue a fresh access token."""
@@ -78,7 +86,11 @@ async def refresh_token(req: RefreshRequest, db: AsyncSession = Depends(get_db))
     stmt = select(RefreshToken).where(RefreshToken.token_hash == req_hash)
     token_record = (await db.execute(stmt)).scalar_one_or_none()
 
-    if not token_record or token_record.revoked_at is not None or token_record.expires_at < now:
+    if (
+        not token_record
+        or token_record.revoked_at is not None
+        or (ensure_utc(token_record.expires_at) or now) < now
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired refresh token",
