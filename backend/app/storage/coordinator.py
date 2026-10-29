@@ -252,6 +252,8 @@ class StorageCoordinator:
 
         full_plaintext = bytearray()
 
+        failed_node_ids: set[str] = set()
+
         async with httpx.AsyncClient(verify=False) as client:
             for c in chunks_meta:
                 cid = c["id"]
@@ -259,12 +261,15 @@ class StorageCoordinator:
                 nonce_b64 = c["nonce"]
                 ranked = all_ranked_nodes[cid]
 
+                # Prioritize healthy nodes that haven't failed recently for instant failover
+                candidate_nodes = sorted(ranked, key=lambda n: 1 if n.id in failed_node_ids else 0)
+
                 ciphertext: bytes | None = None
 
-                for node in ranked:
+                for node in candidate_nodes:
                     url = f"{node.endpoint.rstrip('/')}/v1/chunks/{cid}"
                     try:
-                        res = await client.get(url, timeout=5.0)
+                        res = await client.get(url, timeout=1.5)
                         if res.status_code == 200:
                             actual_hash = hashlib.sha256(res.content).hexdigest().lower()
                             if actual_hash == cid:
@@ -272,7 +277,10 @@ class StorageCoordinator:
                                 break
                             else:
                                 logger.warning(f"Corrupt chunk {cid} detected on node {node.id}")
+                        else:
+                            failed_node_ids.add(node.id)
                     except Exception:
+                        failed_node_ids.add(node.id)
                         continue
 
                 if ciphertext is None:

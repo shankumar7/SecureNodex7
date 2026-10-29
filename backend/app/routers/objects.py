@@ -374,8 +374,9 @@ async def download_object(
     headers = {
         "Content-Disposition": f'attachment; filename="{obj.name}"',
         "Content-Length": str(len(data)),
+        "Content-Type": "application/octet-stream",
     }
-    return Response(content=data, status_code=status.HTTP_200_OK, headers=headers)
+    return Response(content=data, status_code=status.HTTP_200_OK, headers=headers, media_type="application/octet-stream")
 
 
 @router.post("/objects/{object_id}/share")

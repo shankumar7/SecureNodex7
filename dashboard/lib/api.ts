@@ -71,7 +71,13 @@ class ApiClient {
       throw new Error(`[${res.status}] ${errorDetail}`);
     }
 
-    if (res.headers.get("Content-Type")?.includes("application/octet-stream")) {
+    const contentType = res.headers.get("Content-Type") || "";
+    if (
+      contentType.includes("application/octet-stream") ||
+      contentType.includes("application/pdf") ||
+      contentType.includes("image/") ||
+      res.headers.get("Content-Disposition")?.includes("attachment")
+    ) {
       return (await res.blob()) as unknown as T;
     }
 
@@ -198,9 +204,23 @@ class ApiClient {
   }
 
   async downloadObject(id: string): Promise<Blob> {
-    return this.request<Blob>(`/v1/objects/${id}/download`, {
-      headers: { Accept: "application/octet-stream" },
+    const token = this.getToken();
+    const res = await fetch(`${API_BASE}/v1/objects/${id}/download`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
     });
+
+    if (!res.ok) {
+      let errorDetail = res.statusText;
+      try {
+        const errJson = await res.json();
+        errorDetail = errJson.detail || errJson.title || JSON.stringify(errJson);
+      } catch (_) {}
+      throw new Error(`[${res.status}] ${errorDetail}`);
+    }
+
+    return res.blob();
   }
 
   async tombstoneObject(id: string) {
