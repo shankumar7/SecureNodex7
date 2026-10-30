@@ -186,8 +186,8 @@ const Header = ({ isClosing = false }: { isClosing?: boolean }) => {
                             ? 'contentHide 0.5s ease both'
                             : 'contentReveal 0.5s ease 0.4s both'
                     }}>
-                        <Link
-                            to="/login"
+                        <a
+                            href="http://localhost:3000"
                             style={{
                                 textDecoration: 'none',
                                 fontFamily: "'Kanit', sans-serif",
@@ -210,7 +210,7 @@ const Header = ({ isClosing = false }: { isClosing?: boolean }) => {
                             }}
                         >
                             Log in
-                        </Link>
+                        </a>
                         <span style={{ color: 'rgba(71, 85, 105, 0.4)', userSelect: 'none' }}>|</span>
                         <Link to="/signup" style={{
                             textDecoration: 'none',

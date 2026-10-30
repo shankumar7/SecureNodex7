@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import heroImg from '../assets/hero_img_1.png'
-import dheerajImg from '../assets/Dheeraj_Pusuluri.png'
+import aditiImg from '../assets/aditi.jpeg'
 import rithwikImg from '../assets/Dokku_Rithwik.png'
-import ezazImg from '../assets/T_MD_Ezaz_Ali.png'
+import premImg from '../assets/prem.jpeg'
 import shanImg from '../assets/Shankumar_Pitta.png'
 import { Activity, Cpu as Hardware, Cloud, Network, Rocket, TrendingUp, Users, ArrowRight, Terminal } from 'lucide-react'
 import { useDeviceType } from '../hooks/useDeviceType'
@@ -267,7 +267,7 @@ const Home = () => {
     const [headerState, setHeaderState] = useState<'hidden' | 'visible' | 'closing'>('hidden')
     const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const handleLoginTransition = () => {
-        navigate('/login')
+        window.location.href = 'http://localhost:3000'
     }
 
     // Using useScroll hook directly for hero effects to avoid React state re-render lag
@@ -578,16 +578,16 @@ const Home = () => {
                                         img: rithwikImg
                                     },
                                     {
-                                        name: 'Dheeraj Pusuluri',
-                                        role: 'Security Engineer',
-                                        desc: 'Expert in secure mutual authentication and end-to-end cryptographic protocol design.',
-                                        img: dheerajImg
+                                        name: 'Aditi',
+                                        role: 'Researcher',
+                                        desc: 'Focusing on zero-trust cryptography, secure protocols, and IoT threat analysis.',
+                                        img: aditiImg
                                     },
                                     {
-                                        name: 'T MD Ezaz Ali',
-                                        role: 'Core Developer',
-                                        desc: 'Focused on lightweight embedded systems and scalable cloud-to-hardware connectivity.',
-                                        img: ezazImg
+                                        name: 'Prem',
+                                        role: 'Client Side Developer',
+                                        desc: 'Specializing in reactive user interfaces, client-side performance, and hardware dashboards.',
+                                        img: premImg
                                     }
                                 ].map((member, i) => (
                                     <MemberCard key={i} member={member} i={0.4 + i * 0.1} isMobile={isMobile} />

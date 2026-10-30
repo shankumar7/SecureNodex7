@@ -627,9 +627,9 @@ export default function Signup() {
                         {/* Bottom Signin Link */}
                         <div style={{ marginTop: '32px', fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>
                             Already have an account?{' '}
-                            <Link to="/login" style={{ color: '#111827', fontWeight: 700, textDecoration: 'none' }}>
+                            <a href="http://localhost:3000" style={{ color: '#111827', fontWeight: 700, textDecoration: 'none' }}>
                                 Sign In
-                            </Link>
+                            </a>
                         </div>
 
                     </div>

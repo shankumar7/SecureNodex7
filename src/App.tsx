@@ -22,7 +22,19 @@ import AuthenticationTab from './pages/PersonalDashboard/AuthenticationTab'
 import DeviceControlTab from './pages/PersonalDashboard/DeviceControlTab'
 import SecurityAlertsTab from './pages/PersonalDashboard/SecurityAlertsTab'
 import ScrollToTop from './components/ScrollToTop'
+import { useEffect } from 'react'
 import './App.css'
+
+const RedirectToDashboard = () => {
+  useEffect(() => {
+    window.location.href = 'http://localhost:3000'
+  }, [])
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a', color: '#e2e8f0', fontFamily: "'Inter', sans-serif" }}>
+      <p>Redirecting to SecureNodeX Dashboard...</p>
+    </div>
+  )
+}
 
 function App() {
   const location = useLocation()
@@ -33,7 +45,7 @@ function App() {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<RedirectToDashboard />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />

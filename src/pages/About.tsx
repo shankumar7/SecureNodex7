@@ -4,9 +4,9 @@ import Header from '../components/Header';
 import StickyFooter from '@/components/ui/footer';
 import { ShieldAlert, Cpu, Lock, Network } from 'lucide-react';
 import shanImg from '../assets/Shankumar_Pitta.png';
-import dheerajImg from '../assets/Dheeraj_Pusuluri.png';
+import aditiImg from '../assets/aditi.jpeg';
 import rithwikImg from '../assets/Dokku_Rithwik.png';
-import ezazImg from '../assets/T_MD_Ezaz_Ali.png';
+import premImg from '../assets/prem.jpeg';
 
 const fadeIn: any = {
     initial: { opacity: 0, y: 30 },
@@ -16,9 +16,9 @@ const fadeIn: any = {
 
 const team = [
     { name: 'Shankumar Pitta', role: 'Architecture & Cryptography', image: shanImg },
-    { name: 'Dheeraj Pusuluri', role: 'Hardware Integration', image: dheerajImg },
+    { name: 'Aditi', role: 'Researcher', image: aditiImg },
     { name: 'Rithwik Dokku', role: 'Network Security', image: rithwikImg },
-    { name: 'MD Ezaz Ali', role: 'Frontend Systems', image: ezazImg },
+    { name: 'Prem', role: 'Client Side Developer', image: premImg },
 ];
 
 const About = () => {

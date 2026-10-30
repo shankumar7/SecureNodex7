@@ -6,6 +6,10 @@ import { authService } from '../lib/auth'
 import { useDeviceType } from '../hooks/useDeviceType'
 
 export default function Login() {
+    useEffect(() => {
+        window.location.href = 'http://localhost:3000';
+    }, []);
+
     const { isMobile } = useDeviceType()
     const navigate = useNavigate()
 

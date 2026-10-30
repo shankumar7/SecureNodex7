@@ -63,7 +63,7 @@ const Firmware = () => {
                         </p>
 
                         <div className="flex flex-wrap gap-4">
-                            <Link to="/login">
+                            <a href="http://localhost:3000">
                                 <motion.button
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
@@ -71,7 +71,7 @@ const Firmware = () => {
                                 >
                                     Access Integration Code <ArrowRight size={20} />
                                 </motion.button>
-                            </Link>
+                            </a>
                             <Link to="/docs">
                                 <motion.button
                                     whileHover={{ scale: 1.02 }}
@@ -154,7 +154,7 @@ void loop() {
                                         Integration code and unique architecture identifiers are cryptographically protected. Please authenticate to access your personalized node boilerplate.
                                     </p>
 
-                                    <Link to="/login">
+                                    <a href="http://localhost:3000">
                                         <motion.button
                                             whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(79, 70, 229, 0.4)" }}
                                             whileTap={{ scale: 0.95 }}
@@ -162,7 +162,7 @@ void loop() {
                                         >
                                             Authenticate to View <ArrowRight size={20} />
                                         </motion.button>
-                                    </Link>
+                                    </a>
                                 </motion.div>
                             </div>
                         </div>

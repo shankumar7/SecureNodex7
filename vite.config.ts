@@ -3,7 +3,22 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'redirect-login',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && (req.url === '/login' || req.url === '/login/')) {
+            res.writeHead(302, { Location: 'http://localhost:3000' });
+            res.end();
+            return;
+          }
+          next();
+        });
+      },
+    },
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -14,3 +29,4 @@ export default defineConfig({
     host: '0.0.0.0',
   },
 });
+
