@@ -123,11 +123,12 @@ export const TelemetryTab: React.FC<TelemetryTabProps> = ({ messages }) => {
 
       {/* Proof Inspection Modal */}
       {selectedMsg && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-slide-fade">
-          <div className="w-full max-w-lg snx-card p-6 space-y-4 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-lg my-auto bg-white dark:bg-[#0E1526] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-6 space-y-4 animate-slide-fade">
             <button
               onClick={() => setSelectedMsg(null)}
-              className="absolute top-4 right-4 text-snx-muted hover:text-snx-primary"
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition"
+              title="Close modal"
             >
               <X className="w-4 h-4" />
             </button>

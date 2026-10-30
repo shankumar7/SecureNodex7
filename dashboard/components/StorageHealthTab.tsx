@@ -341,8 +341,8 @@ export const StorageHealthTab: React.FC<StorageHealthTabProps> = ({ health, node
 
       {/* Connect Remote Node Modal */}
       {isAddNodeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-slide-fade">
-          <div className="relative w-full max-w-sm snx-card p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-sm my-auto bg-white dark:bg-[#0E1526] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-6 space-y-4 animate-slide-fade">
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-glass-subtle)]">
               <div>
                 <h3 className="text-base font-bold text-snx-primary">Connect Node</h3>
@@ -423,8 +423,8 @@ export const StorageHealthTab: React.FC<StorageHealthTabProps> = ({ health, node
 
       {/* Edit Node Endpoint / IP Modal */}
       {isEditModalOpen && editingNode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-slide-fade">
-          <div className="relative w-full max-w-sm snx-card p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-sm my-auto bg-white dark:bg-[#0E1526] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-6 space-y-4 animate-slide-fade">
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-glass-subtle)]">
               <div>
                 <h3 className="text-base font-bold text-snx-primary">Edit Node Endpoint</h3>
