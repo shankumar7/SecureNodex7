@@ -123,8 +123,11 @@ function DashboardContent() {
       setWsConnected(false);
     }
 
-    // Synthetic Telemetry Pulse Generator when disconnected
+    // Synthetic Telemetry Pulse Generator (only active if WebSocket is disconnected)
     fallbackInterval = setInterval(() => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        return; // Live WebSocket stream is connected; do not push fake telemetry
+      }
       const simDevId = `d-esp32-${Math.floor(Math.random() * 3 + 1).toString().padStart(2, "0")}`;
       const mockMsg: TelemetryMessage = {
         id: `synth-${Date.now()}`,
