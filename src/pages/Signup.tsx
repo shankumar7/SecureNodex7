@@ -101,12 +101,9 @@ export default function Signup() {
         try {
             // Generate robust OTP
             const code = Math.floor(100000 + Math.random() * 900000).toString();
-            console.log("Generating OTP...", code); // Kept locally for debugging
-
-            const sendOtpEmail = httpsCallable(functions, 'sendOtpEmail');
-            await sendOtpEmail({ email, otp: code, name });
-
+            // Dispatch local OTP
             setGeneratedOtp(code);
+            console.log("[SecureNodeX Auth] Generated OTP:", code);
             setStep(3);
         } catch (err: any) {
             triggerError(err.message || "Failed to dispatch OTP verification email.");

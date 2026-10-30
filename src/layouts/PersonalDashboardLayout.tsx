@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { LogOut, User, Activity, Server, ShieldCheck, Key, Terminal } from 'lucide-react'
-import { auth, db } from '../firebase/config'
-import { doc, getDoc } from 'firebase/firestore'
-import { signOut } from 'firebase/auth'
+import { authService } from '../lib/auth'
 import Background from '../components/Background'
 
 const PersonalDashboardLayout = () => {
     const location = useLocation()
     const navigate = useNavigate()
-    const [userName, setUserName] = useState<string>('User')
+    const [userName, setUserName] = useState<string>('Admin')
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
     useEffect(() => {
@@ -19,28 +17,15 @@ const PersonalDashboardLayout = () => {
     }, [])
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            if (auth.currentUser) {
-                try {
-                    const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid))
-                    if (userDoc.exists()) {
-                        setUserName(userDoc.data().name || 'User')
-                    }
-                } catch (err) {
-                    console.error("Failed to fetch user name", err)
-                }
-            }
+        const user = authService.getCurrentUser()
+        if (user) {
+            setUserName(user.name || user.username || 'Admin')
         }
-        fetchUserData()
     }, [])
 
     const handleLogout = async () => {
-        try {
-            await signOut(auth)
-            navigate('/login')
-        } catch (error) {
-            console.error('Logout failed', error)
-        }
+        authService.logout()
+        navigate('/login')
     }
 
     const navTabs = [

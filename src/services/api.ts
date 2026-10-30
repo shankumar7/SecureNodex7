@@ -1,6 +1,6 @@
 import { authService } from '../lib/auth';
 
-const PYTHON_SERVER_URL = import.meta.env?.VITE_PYTHON_SERVER_URL || 'http://localhost:8443';
+const PYTHON_SERVER_URL = (typeof (import.meta as any) !== 'undefined' && (import.meta as any).env?.VITE_PYTHON_SERVER_URL) || 'http://localhost:8443';
 
 const getAuthToken = async (): Promise<string | null> => {
     return authService.getToken();

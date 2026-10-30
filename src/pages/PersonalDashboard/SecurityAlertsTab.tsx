@@ -74,29 +74,24 @@ const SecurityAlertsTab = () => {
     const [alerts, setAlerts] = useState<any[]>(mockAlerts);
 
     useEffect(() => {
-        const q = query(
-            collection(db, 'security_alerts'),
-            orderBy('timestamp', 'desc'),
-            limit(10)
-        );
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetchedAlerts: any[] = [];
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                fetchedAlerts.push({
-                    id: doc.id,
-                    type: data.type || 'Unknown Alert',
-                    device: data.device || 'Unknown Device',
-                    time: data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now',
-                    severity: data.severity || 'medium',
-                    autoBlocked: data.autoBlocked || false,
-                });
+        fetch('http://localhost:8443/v1/audit/events')
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.items && data.items.length > 0) {
+                    const fetched = data.items.slice(0, 10).map((ev: any, idx: number) => ({
+                        id: `EV-${idx + 1}`,
+                        type: ev.event_type || 'Audit Event',
+                        device: ev.actor_id || 'Cluster Node',
+                        time: new Date(ev.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        severity: ev.event_type?.includes('TAMPER') || ev.event_type?.includes('FAIL') ? 'critical' : 'medium',
+                        autoBlocked: true,
+                    }));
+                    setAlerts(fetched);
+                }
+            })
+            .catch(() => {
+                setAlerts(mockAlerts);
             });
-            if (fetchedAlerts.length > 0) {
-                setAlerts(fetchedAlerts);
-            }
-        });
-        return () => unsubscribe();
     }, []);
 
     return (

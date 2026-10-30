@@ -70,19 +70,19 @@ const ActionBtn = ({ icon, label, primary = false, danger = false, onClick, disa
 const DeviceControlTab = () => {
     const [command, setCommand] = useState('');
     const [terminalLogs, setTerminalLogs] = useState([
-        { type: 'info', text: 'Broker connection initialized on port 8883.' },
-        { type: 'success', text: 'Subscribed to topic: edaf/devices/+/control' }
+        { type: 'info', text: 'Broker connection initialized on port 1883.' },
+        { type: 'success', text: 'Subscribed to topic: snx/v1/dev/+/control' }
     ]);
     const [isPublishing, setIsPublishing] = useState(false);
-    const activeDevice = 'Node_Alpha'; // hardcoded selected device for now
-
+    const activeDevice = 'esp32-01'; // selected device
+    
     const handlePublish = async (cmdPayload: string) => {
         if (!cmdPayload.trim()) return;
         setIsPublishing(true);
 
         // Add optimistic log
         const timestamp = new Date().toLocaleTimeString([], { hour12: false });
-        setTerminalLogs(prev => [...prev, { type: 'tx', text: `[${timestamp}] TX: ${cmdPayload} -> edaf/devices/${activeDevice}/control` }]);
+        setTerminalLogs(prev => [...prev, { type: 'tx', text: `[${timestamp}] TX: ${cmdPayload} -> snx/v1/dev/${activeDevice}/control` }]);
 
         try {
             await edafApi.publishCommand(activeDevice, cmdPayload);
